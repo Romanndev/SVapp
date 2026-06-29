@@ -53,9 +53,9 @@ def parameters (ticker_name) :
     list_parameters.append(currentPrice)            # текущий прайс
     list_parameters.append(financialCurrency)       # тип валюты
     list_parameters.append(eps)                     # EPS (прибыль на акцию за 12 мес.)
-    list_parameters.append(g)                       # Ожидаемый рост прибыли (прогноз 5 лет)
+    list_parameters.append(round(g,2))                       # Ожидаемый рост прибыли (прогноз 5 лет)
     list_parameters.append(y)                       # Актуальная ставка на сегодня
-    list_parameters.append(bvps)                    # Балансовая стоимость на акцию
+    list_parameters.append(round(bvps,2))                    # Балансовая стоимость на акцию
 
     return list_parameters
 
@@ -73,8 +73,8 @@ for i in fh :
 fh.close()
 
 for i in list_of_tikers :
-    list_parameters = parameters (ticker_name)
-    dict_company[ticker_name] = list_parameters 
+    list_parameters = parameters (i)
+    dict_company[i] = list_parameters 
     
 for i,j in dict_company.items() :
     print(i,j)
