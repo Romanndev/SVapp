@@ -70,3 +70,6 @@ for i in list_of_tikers :
 for i,j in dict_company.items() :
     print(i,j)
 
+# взять параметры и просчитать число грэма
+
+# записать данные из словаря dict_company + число грэма в БД с меткой покупать или нет
