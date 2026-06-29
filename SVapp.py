@@ -8,7 +8,8 @@ dict_company = dict()
 
 
 #-------------------------------------------------------------------------------------
-# фнкция расчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
+# функция рассчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
+# The function calculates variants of Graham's formula based on the given parameters (in the year of publication) and returns a dictionary.
 #-------------------------------------------------------------------------------------
 def value(eps,bvps) :
           
@@ -18,12 +19,14 @@ def value(eps,bvps) :
     return GRAHAM_NUMBERS
 #-------------------------------------------------------------------------------------
 # функция собирает параметры для расчета формул Грэма
+# The function collects parameters for calculating Graham's formulas
 #-------------------------------------------------------------------------------------
 def parameters (ticker_name) :
 
     list_parameters = list()
 
-    # 1. Создаем сессию requests и маскируемся под обычный браузер
+    # Создаем сессию requests и маскируемся под обычный браузер
+    # Create a requests session and disguise it as a regular browser
     session = requests.Session()
     session.headers.update({
        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -32,27 +35,28 @@ def parameters (ticker_name) :
     stock = yf.Ticker(ticker_name, session=session)
     info = stock.info
     
-        # Достаем параметры для формул Грэма:
+    # Достаем параметры для формул Грэма:
+    # We get the parameters for Graham's formulas:
     
-    currency = info.get('currency')            # тип валюты
-    currentPrice = info.get('currentPrice')             # Текущая рыночная цена
-    eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.)
-    bvps = info.get('bookValue')                        # Балансовая стоимость на акцию
+    currency = info.get('currency')                     # тип валюты / currency type
+    currentPrice = info.get('currentPrice')             # Текущая рыночная цена / Current market price
+    eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.) / EPS (Trailing 12 Month Earnings Per Share)
+    bvps = info.get('bookValue')                        # Балансовая стоимость на акцию / Book value per share
     
     
-    list_parameters.append(ticker_name)             # название тикера
-    list_parameters.append(info.get('longName'))    # полное название
-    list_parameters.append(currentPrice)            # текущий прайс
-    list_parameters.append(currency)       # тип валюты
-    list_parameters.append(eps)                     # EPS (прибыль на акцию за 12 мес.)
-    list_parameters.append(round(bvps,2))           # Балансовая стоимость на акцию
+    list_parameters.append(ticker_name)             
+    list_parameters.append(info.get('longName'))    
+    list_parameters.append(currentPrice)            
+    list_parameters.append(currency)                
+    list_parameters.append(eps)                     
+    list_parameters.append(round(bvps,2))           
 
     return list_parameters
 
 #-------------------------------------------------------------------------------------
 # main code
 #-------------------------------------------------------------------------------------
-#забираем тикеры из файла    
+# забираем тикеры из файла / We extract tickers from the file   
 fh = open('list_of_tickers.txt','r')
 
 for i in fh :
