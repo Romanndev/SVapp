@@ -4,6 +4,7 @@ import requests
 
 list_of_tikers = list()
 list_parameters = list()
+dict_company = dict()
 
 
 #-------------------------------------------------------------------------------------
@@ -73,7 +74,8 @@ fh.close()
 
 for i in list_of_tikers :
     list_parameters = parameters (ticker_name)
+    dict_company[ticker_name] = list_parameters 
     
-for i in list_parameters :
-    print(i)
+for i,j in dict_company.items() :
+    print(i,j)
 
