@@ -10,17 +10,10 @@ dict_company = dict()
 #-------------------------------------------------------------------------------------
 # фнкция расчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
 #-------------------------------------------------------------------------------------
-def value(eps,g,y,bvps) :
-    GRAHAM_NUMBERS = {}
-
-    GRAHAM_1962 = eps*(8.5 + 2*g)
-    GRAHAM_NUMBERS['Graham 1962 formula(with growth forecast):'] = round(GRAHAM_1962,2)
-     
-    GRAHAM_1974 =((eps*(8.5 + 2*g))*4.4)/y
-    GRAHAM_NUMBERS['Graham 1974 formula(with growth forecast):'] = round(GRAHAM_1974,2)
-      
+def value(eps,bvps) :
+          
     GRAHAM_1949 = math.sqrt(22.5*eps*bvps)
-    GRAHAM_NUMBERS['Graham 1949 formula(excluding growth forecast):'] = round(GRAHAM_1949,2)
+    GRAHAM_NUMBERS = round(GRAHAM_1949,2)
  
     return GRAHAM_NUMBERS
 #-------------------------------------------------------------------------------------
@@ -46,18 +39,18 @@ def parameters (ticker_name) :
     currentPrice = info.get('currentPrice')             # Текущая рыночная цена
     eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.)
     bvps = info.get('bookValue')                        # Балансовая стоимость на акцию
-    peg = info.get('pegRatio')                          # PEG Ratio (Price/Earnings-to-Growth) расчет по формуле peg= (p/e)/g 
-    pe = info.get('trailingPE')                         # текущий P/E
-    g = pe/peg                                          # Ожидаемый рост прибыли (прогноз 5 лет)
-    y = 4.38                                            # Актуальная ставка на сегодня
+    #peg = info.get('pegRatio')                          # PEG Ratio (Price/Earnings-to-Growth) расчет по формуле peg= (p/e)/g 
+    #pe = info.get('trailingPE')                         # текущий P/E
+    #g = pe/peg                                          # Ожидаемый рост прибыли (прогноз 5 лет)
+    #y = 4.38                                            # Актуальная ставка на сегодня
     
     list_parameters.append(ticker_name)             # название тикера
     list_parameters.append(info.get('longName'))    # полное название
     list_parameters.append(currentPrice)            # текущий прайс
     list_parameters.append(financialCurrency)       # тип валюты
     list_parameters.append(eps)                     # EPS (прибыль на акцию за 12 мес.)
-    list_parameters.append(round(g,2))              # Ожидаемый рост прибыли (прогноз 5 лет)
-    list_parameters.append(y)                       # Актуальная ставка на сегодня
+    #list_parameters.append(round(g,2))              # Ожидаемый рост прибыли (прогноз 5 лет)
+    #list_parameters.append(y)                       # Актуальная ставка на сегодня
     list_parameters.append(round(bvps,2))           # Балансовая стоимость на акцию
 
     return list_parameters
