@@ -4,16 +4,20 @@ import requests
 
 
 
-# фнкция расчитывает варианты формулы Грэма по заданным параметрам(в год публикации)
+# фнкция расчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
 def value(eps,g,y,bvps) :
+    GRAHAM_NUMBERS = {}
+
     GRAHAM_1962 = eps*(8.5 + 2*g)
-    print('Graham 1962 formula:',GRAHAM_1962)
-
+    GRAHAM_NUMBERS['Graham 1962 formula(with growth forecast):'] = round(GRAHAM_1962,2)
+     
     GRAHAM_1974 =((eps*(8.5 + 2*g))*4.4)/y
-    print('Graham 1974 formula:',GRAHAM_1974)
-
+    GRAHAM_NUMBERS['Graham 1974 formula(with growth forecast):'] = round(GRAHAM_1974,2)
+      
     GRAHAM_1949 = math.sqrt(22.5*eps*bvps)
-    print('Graham 1974 formula:',GRAHAM_1949)
+    GRAHAM_NUMBERS['Graham 1949 formula(excluding growth forecast):'] = round(GRAHAM_1949,2)
+ 
+    return GRAHAM_NUMBERS
 
 # 1. Создаем сессию requests и маскируемся под обычный браузер
 session = requests.Session()
@@ -26,23 +30,22 @@ ticker_name = input('Enter ticker name:').strip().upper()
 ticker_name = ticker_name +'.TO'
 stock = yf.Ticker(ticker_name, session=session)
 print(ticker_name)
-fast_info = stock.fast_info
-for i in fast_info :
-    print(i)
-
-print('currency', fast_info['currency'])       # валют тикера
-print('lastPrice', fast_info['lastPrice'])     # последний прайс на тикер
-
-#for i in info :
-#    print('attribute',i,info.get(i))
-
+info = stock.info
+print(info.get('longName'))
 
 # Достаем параметры для формул Грэма:
+financialCurrency = info.get('financialCurrency')
+currentPrice = info.get('currentPrice') # Текущая рыночная цена
+eps = info.get('trailingEps')           # EPS (прибыль на акцию за 12 мес.)
+bvps = info.get('bookValue')            # Балансовая стоимость на акцию
+peg = info.get('pegRatio')              # PEG Ratio (Price/Earnings-to-Growth) расчет по формуле peg= (p/e)/g 
+pe = info.get('trailingPE')             # текущий P/E
+g = pe/peg                              # Ожидаемый рост прибыли (прогноз 5 лет)
+y = 4.38                                # Актуальная ставка на сегодня
 
-#current_price = info.get('currentPrice')            # Текущая рыночная цена
-#eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.)
-#bvps = info.get('bookValue')                        # Балансовая стоимость на акцию
-#g = info.get('earningsGrowth5Year')                 # Ожидаемый рост прибыли (прогноз 5 лет)
-#y = 4.38  # Актуальная ставка на сегодня
 
-#print(current_price,eps,bvps,g,y)
+print('Curent price=', currentPrice, financialCurrency)
+GRAHAM_NUMBERS = value(eps,g,y,bvps)
+for i,j in GRAHAM_NUMBERS.items() :
+    print(i,j,'CAD')
+
