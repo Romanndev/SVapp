@@ -9,6 +9,7 @@ dict_company = dict()
 
 #-------------------------------------------------------------------------------------
 # фнкция расчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
+#-------------------------------------------------------------------------------------
 def value(eps,g,y,bvps) :
     GRAHAM_NUMBERS = {}
 
@@ -22,6 +23,8 @@ def value(eps,g,y,bvps) :
     GRAHAM_NUMBERS['Graham 1949 formula(excluding growth forecast):'] = round(GRAHAM_1949,2)
  
     return GRAHAM_NUMBERS
+#-------------------------------------------------------------------------------------
+# функция собирает параметры для расчета формул Грэма
 #-------------------------------------------------------------------------------------
 def parameters (ticker_name) :
 
@@ -53,15 +56,16 @@ def parameters (ticker_name) :
     list_parameters.append(currentPrice)            # текущий прайс
     list_parameters.append(financialCurrency)       # тип валюты
     list_parameters.append(eps)                     # EPS (прибыль на акцию за 12 мес.)
-    list_parameters.append(round(g,2))                       # Ожидаемый рост прибыли (прогноз 5 лет)
+    list_parameters.append(round(g,2))              # Ожидаемый рост прибыли (прогноз 5 лет)
     list_parameters.append(y)                       # Актуальная ставка на сегодня
-    list_parameters.append(round(bvps,2))                    # Балансовая стоимость на акцию
+    list_parameters.append(round(bvps,2))           # Балансовая стоимость на акцию
 
     return list_parameters
 
 #-------------------------------------------------------------------------------------
 # main code
-    
+#-------------------------------------------------------------------------------------
+#забираем тикеры из файла    
 fh = open('list_of_tickers.txt','r')
 
 for i in fh :
