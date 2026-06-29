@@ -2,8 +2,11 @@ import math
 import yfinance as yf
 import requests
 
+list_of_tikers = list()
+list_parameters = list()
 
 
+#-------------------------------------------------------------------------------------
 # фнкция расчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
 def value(eps,g,y,bvps) :
     GRAHAM_NUMBERS = {}
@@ -18,34 +21,59 @@ def value(eps,g,y,bvps) :
     GRAHAM_NUMBERS['Graham 1949 formula(excluding growth forecast):'] = round(GRAHAM_1949,2)
  
     return GRAHAM_NUMBERS
+#-------------------------------------------------------------------------------------
+def parameters (ticker_name) :
 
-# 1. Создаем сессию requests и маскируемся под обычный браузер
-session = requests.Session()
-session.headers.update({
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-})
+    list_parameters = list()
 
+    # 1. Создаем сессию requests и маскируемся под обычный браузер
+    session = requests.Session()
+    session.headers.update({
+       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    })
 
-ticker_name = input('Enter ticker name:').strip().upper()
-ticker_name = ticker_name +'.TO'
-stock = yf.Ticker(ticker_name, session=session)
-print(ticker_name)
-info = stock.info
-print(info.get('longName'))
+    stock = yf.Ticker(ticker_name, session=session)
+    info = stock.info
+    
 
-# Достаем параметры для формул Грэма:
-financialCurrency = info.get('financialCurrency')
-currentPrice = info.get('currentPrice') # Текущая рыночная цена
-eps = info.get('trailingEps')           # EPS (прибыль на акцию за 12 мес.)
-bvps = info.get('bookValue')            # Балансовая стоимость на акцию
-peg = info.get('pegRatio')              # PEG Ratio (Price/Earnings-to-Growth) расчет по формуле peg= (p/e)/g 
-pe = info.get('trailingPE')             # текущий P/E
-g = pe/peg                              # Ожидаемый рост прибыли (прогноз 5 лет)
-y = 4.38                                # Актуальная ставка на сегодня
+    # Достаем параметры для формул Грэма:
+    
+    financialCurrency = info.get('financialCurrency')   # тип валюты
+    currentPrice = info.get('currentPrice')             # Текущая рыночная цена
+    eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.)
+    bvps = info.get('bookValue')                        # Балансовая стоимость на акцию
+    peg = info.get('pegRatio')                          # PEG Ratio (Price/Earnings-to-Growth) расчет по формуле peg= (p/e)/g 
+    pe = info.get('trailingPE')                         # текущий P/E
+    g = pe/peg                                          # Ожидаемый рост прибыли (прогноз 5 лет)
+    y = 4.38                                            # Актуальная ставка на сегодня
+    
+    list_parameters.append(ticker_name)             # название тикера
+    list_parameters.append(info.get('longName'))    # полное название
+    list_parameters.append(currentPrice)            # текущий прайс
+    list_parameters.append(financialCurrency)       # тип валюты
+    list_parameters.append(eps)                     # EPS (прибыль на акцию за 12 мес.)
+    list_parameters.append(g)                       # Ожидаемый рост прибыли (прогноз 5 лет)
+    list_parameters.append(y)                       # Актуальная ставка на сегодня
+    list_parameters.append(bvps)                    # Балансовая стоимость на акцию
 
+    return list_parameters
 
-print('Curent price=', currentPrice, financialCurrency)
-GRAHAM_NUMBERS = value(eps,g,y,bvps)
-for i,j in GRAHAM_NUMBERS.items() :
-    print(i,j,'CAD')
+#-------------------------------------------------------------------------------------
+# main code
+    
+fh = open('list_of_tickers.txt','r')
+
+for i in fh :
+    ticker_name = i    
+    ticker_name = ticker_name.strip().upper()
+    ticker_name = ticker_name +'.TO'
+    list_of_tikers.append(ticker_name)
+
+fh.close()
+
+for i in list_of_tikers :
+    list_parameters = parameters (ticker_name)
+    
+for i in list_parameters :
+    print(i)
 
