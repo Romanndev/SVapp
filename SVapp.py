@@ -32,12 +32,9 @@ def parameters (ticker_name) :
     stock = yf.Ticker(ticker_name, session=session)
     info = stock.info
     
-    #for i in info :
-    #    print(i)
-
-    # Достаем параметры для формул Грэма:
+        # Достаем параметры для формул Грэма:
     
-    financialCurrency = info.get('currency')            # тип валюты
+    currency = info.get('currency')            # тип валюты
     currentPrice = info.get('currentPrice')             # Текущая рыночная цена
     eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.)
     bvps = info.get('bookValue')                        # Балансовая стоимость на акцию
@@ -46,7 +43,7 @@ def parameters (ticker_name) :
     list_parameters.append(ticker_name)             # название тикера
     list_parameters.append(info.get('longName'))    # полное название
     list_parameters.append(currentPrice)            # текущий прайс
-    list_parameters.append(financialCurrency)       # тип валюты
+    list_parameters.append(currency)       # тип валюты
     list_parameters.append(eps)                     # EPS (прибыль на акцию за 12 мес.)
     list_parameters.append(round(bvps,2))           # Балансовая стоимость на акцию
 
