@@ -12,9 +12,11 @@ dict_company = dict()
 # The function calculates variants of Graham's formula based on the given parameters (in the year of publication) and returns a dictionary.
 #-------------------------------------------------------------------------------------
 def value(eps,bvps) :
-          
-    GRAHAM_1949 = math.sqrt(22.5*eps*bvps)
-    GRAHAM_NUMBERS = round(GRAHAM_1949,2)
+    if eps <=0 or bvps <=0 :     
+        return None
+    else :    
+        GRAHAM_1949 = math.sqrt(22.5*eps*bvps)
+        GRAHAM_NUMBERS = round(GRAHAM_1949,2)
  
     return GRAHAM_NUMBERS
 #-------------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ def parameters (ticker_name) :
     bvps = info.get('bookValue')                        # Балансовая стоимость на акцию / Book value per share
     
     
-    list_parameters.append(ticker_name)             
+    #list_parameters.append(ticker_name)             
     list_parameters.append(info.get('longName'))    
     list_parameters.append(currentPrice)            
     list_parameters.append(currency)                
@@ -69,11 +71,15 @@ fh.close()
 
 for i in list_of_tikers :
     list_parameters = parameters (i)
+    eps = list_parameters[3]
+    bvps = list_parameters[4]
+    gvalue = value(eps,bvps)
+    list_parameters.append(gvalue)
     dict_company[i] = list_parameters 
     
 for i,j in dict_company.items() :
-    print(i,j[4],j[5])
+    print(i,j)
 
-# взять параметры и просчитать число грэма
+
 
 # записать данные из словаря dict_company + число грэма в БД с меткой покупать или нет
