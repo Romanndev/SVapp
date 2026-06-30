@@ -1,6 +1,7 @@
 import math
 import yfinance as yf
 import requests
+import sqlite3
 
 list_of_tikers = list()
 list_parameters = list()
@@ -77,9 +78,32 @@ for i in list_of_tikers :
     list_parameters.append(gvalue)
     dict_company[i] = list_parameters 
     
-for i,j in dict_company.items() :
-    print(i,j)
 
-#дддддддддддддддддддддддддддааааааааааааааа
+#-------------------------------------------------------------------------------------
+
+conn = sqlite3.connect('BD_tickers.sqlite')
+cur = conn.cursor()
+
+cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
+        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 
+        ticker TEXT UNIQUE,
+        fullname TEXT UNIQUE,
+        price INTEGER,
+        currency TEXT,
+        gvalues INTEGER, 
+        status TEXT UNIQUE)                    
+                 
+''')
+cur.execute('''DELETE FROM Tickers''')
+
+for i,j in dict_company.items() :
+    if j[1] < j[5] :
+        status = 'YES'
+        cur.execute('INSERT INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+    else :
+        status = 'NO'
+        cur.execute('INSERT INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+
+
 
 # записать данные из словаря dict_company + число грэма в БД с меткой покупать или нет
