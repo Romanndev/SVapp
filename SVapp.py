@@ -72,7 +72,7 @@ for i in list_of_tikers :
     dict_company[i] = list_parameters 
     
 for i,j in dict_company.items() :
-    print(i,j)
+    print(i,j[4],j[5])
 
 # взять параметры и просчитать число грэма
 
