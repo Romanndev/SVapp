@@ -1,54 +1,54 @@
 # SVapp
 
-**SVapp** (Stock Valuation app) — приложение для автоматизации предварительной оценки справедливой стоимости акций на основе фундаментальных показателей.
+**SVapp** (Stock Valuation app) is an application designed to automate the preliminary evaluation of a stock's fair value based on fundamental metrics.
 
-> ⚠️ **Дисклеймер:** Результаты расчетов не являются финансовой рекомендацией.
-
----
-
-## 🚀 Как это работает?
-
-1. **Чтение данных:** Приложение считывает список интересующих тикеров из текстового файла `list_of_tickers.txt`.
-2. **Парсинг:** Скрипт собирает необходимые финансовые параметры с сайта [Yahoo Finance (CA)](https://ca.finance.yahoo.com/).
-3. **Расчет и сохранение:** На основе собранных данных рассчитывается справедливая стоимость, после чего результаты сохраняются в базу данных SQLite (`BD_tickers.sqlite`).
+> ⚠️ **Disclaimer:** The calculation results are for informational purposes only and do not constitute financial advice.
 
 ---
 
-## 🛠️ Стек технологий
+## 🚀 How It Works
 
-Проект разработан на языке **Python** и использует следующий набор библиотек и инструментов:
-
-* **Язык разработки:** Python 3.x
-* **Сбор и парсинг данных:**
-    * [`yfinance`](https://github.com/ranaroussi/yfinance) — получение финансовой аналитики, показателей EPS и BVPS напрямую из Yahoo Finance API.
-    * [`requests`](https://requests.readthedocs.io/) — отправка HTTP-запросов для взаимодействия с веб-ресурсами.
-* **Математические вычисления:**
-    * `math` — встроенный модуль Python (используется функция `math.sqrt()` для расчета квадратного корня в формуле Грэма).
-* **Хранение данных:**
-    * `sqlite3` — встроенная легковесная СУБД для локального хранения тикеров, истории расчетов и результатов оценки.
+1. **Data Reading:** The application reads a list of target tickers from a text file named `list_of_tickers.txt`.
+2. **Data Parsing:** The script fetches the required financial metrics from the [Yahoo Finance (CA)](https://ca.finance.yahoo.com/) website.
+3. **Calculation & Storage:** The fair value is calculated based on the collected data, and the results are then saved to a local SQLite database (`BD_tickers.sqlite`).
 
 ---
 
-## ⚙️ Ограничения и исключения
+## 🛠️ Tech Stack
 
-* 🇨🇦 **Рынок:** На данный момент обрабатываются только тикеры фондовой биржи Торонто (суффикс `.TO`).
-* 🏢 **Тип активов:** Программа работает исключительно с акциями компаний. **ETF не поддерживаются**.
-* 🚫 **Исключения:** Тикеры инвестиционных трастов недвижимости и фондов (суффикс `.UN`) временно не обрабатываются.
+The project is built using **Python** and relies on the following libraries and tools:
+
+* **Development Language:** Python 3.x
+* **Data Collection & Parsing:**
+    * [`yfinance`](https://github.com/ranaroussi/yfinance) — used to fetch financial analytics, EPS, and BVPS metrics directly from the Yahoo Finance API.
+    * [`requests`](https://requests.readthedocs.io/) — used for handling HTTP requests to interact with web resources.
+* **Mathematical Calculations:**
+    * `math` — a built-in Python module (specifically using `math.sqrt()` to calculate the square root in the Graham formula).
+* **Data Storage:**
+    * `sqlite3` — a built-in lightweight DBMS used to store tickers, calculation history, and evaluation results locally.
 
 ---
 
-## 🧮 Методология: Число Грэма
+## ⚙️ Limitations and Exceptions
 
-Для оценки используется **Число Грэма (Graham Number)** — классический критерий для консервативных инвесторов, описанный Бенджамином Грэмом в книге «Разумный инвестор».
+* 🇨🇦 **Market:** Currently, the application only processes tickers from the Toronto Stock Exchange (using the `.TO` suffix).
+* 🏢 **Asset Type:** The program is designed exclusively for corporate stocks. **ETFs are not supported**.
+* 🚫 **Exceptions:** Real Estate Investment Trusts (REITs) and income funds (using the `.UN` suffix) are temporarily unsupported.
 
-Грэм сформулировал правило: для защитного инвестора произведение коэффициента цена/прибыль ($P/E$) и цена/балансовая стоимость ($P/B$) не должно превышать **22.5** (где $P/E \le 15$ и $P/B \le 1.5$).
+---
 
-### Формула расчета:
+## 🧮 Methodology: The Graham Number
+
+The valuation is based on the **Graham Number** — a classic metric for defensive (conservative) investors introduced by Benjamin Graham in his book *"The Intelligent Investor"*.
+
+Graham established a rule stating that for a defensive investor, the product of the Price-to-Earnings ($P/E$) ratio and the Price-to-Book ($P/B$) ratio should not exceed **22.5** (where $P/E \le 15$ and $P/B \le 1.5$).
+
+### Valuation Formula:
 
 $$V = \sqrt{22.5 \times \text{EPS} \times \text{BVPS}}$$
 
-Где:
-* **EPS (Earnings Per Share):** Чистая прибыль на одну акцию.
-* **BVPS (Book Value Per Share):** Балансовая стоимость компании на одну акцию.
+Where:
+* **EPS (Earnings Per Share):** The company's net earnings allocated to each outstanding share of common stock.
+* **BVPS (Book Value Per Share):** The book value of the company per outstanding share.
 
-> 💡 **Правило интерпретации:** Если текущая рыночная цена акции ниже полученного Числа Грэма ($V$), компания потенциально считается недооцененной.
+> 💡 **Interpretation Rule:** If the current market price of a stock is lower than the calculated Graham Number ($V$), the company is potentially considered undervalued.
