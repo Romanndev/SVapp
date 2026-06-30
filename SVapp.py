@@ -91,19 +91,26 @@ cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
         price INTEGER,
         currency TEXT,
         gvalues INTEGER, 
-        status TEXT UNIQUE)                    
+        status TEXT)                    
                  
 ''')
 cur.execute('''DELETE FROM Tickers''')
 
 for i,j in dict_company.items() :
-    if j[1] < j[5] :
-        status = 'YES'
-        cur.execute('INSERT INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
-    else :
-        status = 'NO'
-        cur.execute('INSERT INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+ 
+    if j[5] is None :
+        status = 'Unprofitable'
+        cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+        
 
+    else:
+            if j[1] < j[5] :
+                status = 'YES'
+                cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+    
+            else:
+                status = 'NO'
+                cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
 
-
-# записать данные из словаря dict_company + число грэма в БД с меткой покупать или нет
+conn.commit()
+conn.close()
