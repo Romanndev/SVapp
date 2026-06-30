@@ -46,8 +46,7 @@ def parameters (ticker_name) :
     eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.) / EPS (Trailing 12 Month Earnings Per Share)
     bvps = info.get('bookValue')                        # Балансовая стоимость на акцию / Book value per share
     
-    
-    #list_parameters.append(ticker_name)             
+                   
     list_parameters.append(info.get('longName'))    
     list_parameters.append(currentPrice)            
     list_parameters.append(currency)                
