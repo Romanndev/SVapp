@@ -59,7 +59,9 @@ def parameters (ticker_name) :
 #-------------------------------------------------------------------------------------
 # main code
 #-------------------------------------------------------------------------------------
+
 # забираем тикеры из файла / We extract tickers from the file   
+
 fh = open('list_of_tickers.txt','r')
 
 for i in fh :
@@ -70,6 +72,8 @@ for i in fh :
 
 fh.close()
 
+# получить параметры по тикерам, рассчитывать справедливую стоимость/ Get ticker parameters and calculate fair value
+
 for i in list_of_tikers :
     list_parameters = parameters (i)
     eps = list_parameters[3]
@@ -79,7 +83,7 @@ for i in list_of_tikers :
     dict_company[i] = list_parameters 
     
 
-#-------------------------------------------------------------------------------------
+# сохранить полученные данные и оценку привлекательности к покупке тикеров/ save the obtained data and the assessment of the attractiveness of purchasing tickers
 
 conn = sqlite3.connect('BD_tickers.sqlite')
 cur = conn.cursor()
