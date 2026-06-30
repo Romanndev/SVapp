@@ -99,7 +99,7 @@ cur.execute('''DELETE FROM Tickers''')
 for i,j in dict_company.items() :
  
     if j[5] is None :
-        status = 'Unprofitable'
+        status = 'NO'
         cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
         
 
