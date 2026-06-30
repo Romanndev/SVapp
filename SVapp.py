@@ -30,6 +30,7 @@ def parameters (ticker_name) :
 
     # Создаем сессию requests и маскируемся под обычный браузер
     # Create a requests session and disguise it as a regular browser
+    
     session = requests.Session()
     session.headers.update({
        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -38,8 +39,7 @@ def parameters (ticker_name) :
     stock = yf.Ticker(ticker_name, session=session)
     info = stock.info
     
-    # Достаем параметры для формул Грэма:
-    # We get the parameters for Graham's formulas:
+    # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
     
     currency = info.get('currency')                     # тип валюты / currency type
     currentPrice = info.get('currentPrice')             # Текущая рыночная цена / Current market price
@@ -71,7 +71,8 @@ for i in fh :
 
 fh.close()
 
-# получить параметры по тикерам, рассчитывать справедливую стоимость/ Get ticker parameters and calculate fair value
+# получить параметры по тикерам, рассчитывать справедливую стоимость
+# Get ticker parameters and calculate fair value
 
 for i in list_of_tikers :
     list_parameters = parameters (i)
@@ -82,7 +83,8 @@ for i in list_of_tikers :
     dict_company[i] = list_parameters 
     
 
-# сохранить полученные данные и оценку привлекательности к покупке тикеров/ save the obtained data and the assessment of the attractiveness of purchasing tickers
+# сохранить полученные данные и оценку привлекательности к покупке тикеров 
+# save the obtained data and the assessment of the attractiveness of purchasing tickers
 
 conn = sqlite3.connect('BD_tickers.sqlite')
 cur = conn.cursor()
@@ -104,8 +106,7 @@ for i,j in dict_company.items() :
     if j[5] is None :
         status = 'NO'
         cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
-        
-
+     
     else:
             if j[1] < j[5] :
                 status = 'YES'
