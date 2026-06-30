@@ -80,6 +80,6 @@ for i in list_of_tikers :
 for i,j in dict_company.items() :
     print(i,j)
 
-
+#дддддддддддддддддддддддддддааааааааааааааа
 
 # записать данные из словаря dict_company + число грэма в БД с меткой покупать или нет
