@@ -3,7 +3,7 @@ import yfinance as yf
 import requests
 import sqlite3
 
-list_of_tikers = list()
+list_of_tickers = list()
 list_parameters = list()
 dict_company = dict()
 
@@ -67,14 +67,14 @@ for i in fh :
     ticker_name = i    
     ticker_name = ticker_name.strip().upper()
     ticker_name = ticker_name +'.TO'
-    list_of_tikers.append(ticker_name)
+    list_of_tickers.append(ticker_name)
 
 fh.close()
 
 # получить параметры по тикерам, рассчитывать справедливую стоимость
 # Get ticker parameters and calculate fair value
 
-for i in list_of_tikers :
+for i in list_of_tickers :
     list_parameters = parameters (i)
     eps = list_parameters[3]
     bvps = list_parameters[4]
