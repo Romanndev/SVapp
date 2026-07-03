@@ -6,6 +6,8 @@ import sqlite3
 list_of_tickers = list()
 list_parameters = list()
 dict_company = dict()
+Graham_Multiplier = 22.5
+
 
 
 #-------------------------------------------------------------------------------------
@@ -16,7 +18,7 @@ def value(eps,bvps) :
     if eps <=0 or bvps <=0 :     
         return None
     else :    
-        GRAHAM_1949 = math.sqrt(22.5*eps*bvps)
+        GRAHAM_1949 = math.sqrt(Graham_Multiplier*eps*bvps)
         GRAHAM_NUMBERS = round(GRAHAM_1949,2)
  
     return GRAHAM_NUMBERS
