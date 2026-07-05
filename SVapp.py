@@ -4,8 +4,8 @@ import requests
 import sqlite3
 
 list_of_tickers = list()
-list_parameters = list()
-dict_company = dict()
+CompanyData = list()
+all_companies = dict()
 Graham_Multiplier = 22.5
 
 
@@ -14,7 +14,7 @@ Graham_Multiplier = 22.5
 # функция рассчитывает варианты формулы Грэма по заданным параметрам(в год публикации) ВОЗВРАЩАЕТ СЛОВАРЬ
 # The function calculates variants of Graham's formula based on the given parameters (in the year of publication) and returns a dictionary.
 #-------------------------------------------------------------------------------------
-def value(eps,bvps) :
+def graham_value(eps,bvps) :
     if eps <=0 or bvps <=0 :     
         return None
     else :    
@@ -78,12 +78,12 @@ if __name__ == "__main__":
     # Get ticker parameters and calculate fair value
 
     for i in list_of_tickers :
-        list_parameters = parameters (i)
-        eps = list_parameters[3]
-        bvps = list_parameters[4]
-        gvalue = value(eps,bvps)
-        list_parameters.append(gvalue)
-        dict_company[i] = list_parameters 
+        CompanyData = parameters (i)
+        eps = CompanyData[3]
+        bvps = CompanyData[4]
+        gvalue = graham_value(eps,bvps)
+        CompanyData.append(gvalue)
+        all_companies[i] = CompanyData 
     
 
     # сохранить полученные данные и оценку привлекательности к покупке тикеров 
@@ -104,14 +104,14 @@ if __name__ == "__main__":
     ''')
     cur.execute('''DELETE FROM Tickers''')
 
-    for i,j in dict_company.items() :
+    for name,param in all_companies.items() :
  
-        if j[5] is None or j[1] > j[5] :
+        if param[5] is None or param[1] > param[5] :
             status = 'NO'
         else:
             status = 'YES'
     
-        cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+        cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,name,param[0],param[1],param[2],param[5],status))
  
 
     conn.commit()
