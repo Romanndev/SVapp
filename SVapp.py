@@ -22,6 +22,7 @@ def value(eps,bvps) :
         GRAHAM_NUMBERS = round(GRAHAM_1949,2)
  
     return GRAHAM_NUMBERS
+
 #-------------------------------------------------------------------------------------
 # функция собирает параметры для расчета формул Грэма
 # The function collects parameters for calculating Graham's formulas
@@ -57,66 +58,61 @@ def parameters (ticker_name) :
 
     return list_parameters
 
-#-------------------------------------------------------------------------------------
-# main code
-#-------------------------------------------------------------------------------------
 
-# забираем тикеры из файла / We extract tickers from the file   
+#------------main code-------------------------------------------------------------------------
+if __name__ == "__main__":
 
-fh = open('list_of_tickers.txt','r')
+    # забираем тикеры из файла / We extract tickers from the file   
 
-for i in fh :
-    ticker_name = i    
-    ticker_name = ticker_name.strip().upper()
-    ticker_name = ticker_name +'.TO'
-    list_of_tickers.append(ticker_name)
+    fh = open('list_of_tickers.txt','r')
 
-fh.close()
+    for i in fh :
+        ticker_name = i    
+        ticker_name = ticker_name.strip().upper()
+        ticker_name = ticker_name +'.TO'
+        list_of_tickers.append(ticker_name)
 
-# получить параметры по тикерам, рассчитывать справедливую стоимость
-# Get ticker parameters and calculate fair value
+    fh.close()
 
-for i in list_of_tickers :
-    list_parameters = parameters (i)
-    eps = list_parameters[3]
-    bvps = list_parameters[4]
-    gvalue = value(eps,bvps)
-    list_parameters.append(gvalue)
-    dict_company[i] = list_parameters 
+    # получить параметры по тикерам, рассчитывать справедливую стоимость
+    # Get ticker parameters and calculate fair value
+
+    for i in list_of_tickers :
+        list_parameters = parameters (i)
+        eps = list_parameters[3]
+        bvps = list_parameters[4]
+        gvalue = value(eps,bvps)
+        list_parameters.append(gvalue)
+        dict_company[i] = list_parameters 
     
 
-# сохранить полученные данные и оценку привлекательности к покупке тикеров 
-# save the obtained data and the assessment of the attractiveness of purchasing tickers
+    # сохранить полученные данные и оценку привлекательности к покупке тикеров 
+    # save the obtained data and the assessment of the attractiveness of purchasing tickers
 
-conn = sqlite3.connect('BD_tickers.sqlite')
-cur = conn.cursor()
+    conn = sqlite3.connect('DB_tickers.sqlite')
+    cur = conn.cursor()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
-        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 
-        ticker TEXT UNIQUE,
-        fullname TEXT UNIQUE,
-        price INTEGER,
-        currency TEXT,
-        gvalues INTEGER, 
-        status TEXT)                    
+    cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
+            id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 
+            ticker TEXT UNIQUE,
+            fullname TEXT UNIQUE,
+            price INTEGER,
+            currency TEXT,
+            gvalues INTEGER, 
+            status TEXT)                    
                  
-''')
-cur.execute('''DELETE FROM Tickers''')
+    ''')
+    cur.execute('''DELETE FROM Tickers''')
 
-for i,j in dict_company.items() :
+    for i,j in dict_company.items() :
  
-    if j[5] is None :
-        status = 'NO'
-        cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
-     
-    else:
-            if j[1] < j[5] :
-                status = 'YES'
-                cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+        if j[5] is None or j[1] > j[5] :
+            status = 'NO'
+        else:
+            status = 'YES'
     
-            else:
-                status = 'NO'
-                cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+        cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,gvalues,status) VALUES (?,?,?,?,?,?,?)',(None,i,j[0],j[1],j[2],j[5],status))
+ 
 
-conn.commit()
-conn.close()
+    conn.commit()
+    conn.close()
