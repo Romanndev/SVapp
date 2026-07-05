@@ -10,7 +10,7 @@
 
 1. **Data Reading:** The application reads a list of target tickers from a text file named `list_of_tickers.txt`.
 2. **Data Parsing:** The script fetches the required financial metrics from the [Yahoo Finance (CA)](https://ca.finance.yahoo.com/) website.
-3. **Calculation & Storage:** The fair value is calculated based on the collected data, and the results are then saved to a local SQLite database (`BD_tickers.sqlite`).
+3. **Calculation & Storage:** The fair value is calculated based on the collected data, and the results are then saved to a local SQLite database (`DB_tickers.sqlite`).
 
 ---
 
@@ -52,3 +52,20 @@ Where:
 * **BVPS (Book Value Per Share):** The book value of the company per outstanding share.
 
 > 💡 **Interpretation Rule:** If the current market price of a stock is lower than the calculated Graham Number ($V$), the company is potentially considered undervalued.
+
+## 📥 Installation & Running
+
+Follow these steps to set up and run the application locally:
+
+1. **Install required dependencies:**
+   Make sure you have Python installed. You can install all required libraries at once using the `requirements.txt` file:
+   ```bash
+   pip install -r requirements.txt
+
+2. **Prepare the input file:**
+    Create a text file named `list_of_tickers.txt` in the root directory of the project and add your target Canadian tickers (e.g., TD,LNR), each on a new line.
+
+3. **Launch the application:**
+    Run the main script using Python:
+    ```bash
+    python SVapp.py
