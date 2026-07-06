@@ -41,7 +41,7 @@ def parameters (ticker_name) :
 
     stock = yf.Ticker(ticker_name, session=session)
     info = stock.info
-    
+       
     # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
     
     currency = info.get('currency')                     # тип валюты / currency type
