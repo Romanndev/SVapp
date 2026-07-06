@@ -69,6 +69,7 @@ if __name__ == "__main__":
     for i in fh :
         ticker_name = i    
         ticker_name = ticker_name.strip().upper()
+        ticker_name = ticker_name.replace('/','.')
         ticker_name = ticker_name +'.TO'
         list_of_tickers.append(ticker_name)
 
