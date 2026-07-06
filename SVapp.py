@@ -1,5 +1,4 @@
 import math
-from multiprocessing.util import info
 import yfinance as yf
 import requests
 import sqlite3
