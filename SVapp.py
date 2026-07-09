@@ -34,11 +34,13 @@ def parameters (ticker_name, session) :
     stock = yf.Ticker(ticker_name, session=session)
     try:
         info = stock.info
-    except :
-            return None
+    
+    except Exception as e:
+        print(f"❌ Error loading yfinance data for [{ticker_name}]: {e}")
+        return None
     
 
-        # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
+    # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
     
     currency = info.get('currency')                     # тип валюты / currency type
     currentPrice = info.get('currentPrice')             # Текущая рыночная цена / Current market price
