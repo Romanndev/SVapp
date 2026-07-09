@@ -1,3 +1,4 @@
+from logging import info
 import math
 import yfinance as yf
 import requests
@@ -39,9 +40,13 @@ def parameters (ticker_name, session) :
         print(f"❌ Error loading yfinance data for [{ticker_name}]: {e}")
         return None
     
-#fdffdsflsflsjflkjskdfjlskfjls
-    # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
-    
+    #HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: QWERTY.TO"}}}
+  
+    if info.get('longName') is None:
+        return None
+        
+        # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
+  
     currency = info.get('currency')                     # тип валюты / currency type
     currentPrice = info.get('currentPrice')             # Текущая рыночная цена / Current market price
     eps = info.get('trailingEps')                       # EPS (прибыль на акцию за 12 мес.) / EPS (Trailing 12 Month Earnings Per Share)
@@ -52,14 +57,16 @@ def parameters (ticker_name, session) :
     list_parameters.append(currentPrice)            
     list_parameters.append(currency)                
     list_parameters.append(eps)    
-    try:                 
-     list_parameters.append(round(bvps,2))     
-    except :       
-     list_parameters.append(None)
-
-    return list_parameters
     
+    try:                 
+        list_parameters.append(round(bvps,2))     
+    except :       
+        list_parameters.append(None)
+        
+    return list_parameters
 
+    
+        
 
 #------------main code-------------------------------------------------------------------------
 if __name__ == "__main__":
