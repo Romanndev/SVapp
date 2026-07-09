@@ -39,7 +39,7 @@ def parameters (ticker_name, session) :
         print(f"❌ Error loading yfinance data for [{ticker_name}]: {e}")
         return None
     
-
+#fdffdsflsflsjflkjskdfjlskfjls
     # Достаем параметры для формул Грэма:/ We get the parameters for Graham's formulas:
     
     currency = info.get('currency')                     # тип валюты / currency type
