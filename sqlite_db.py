@@ -1,6 +1,6 @@
 import sqlite3
 
-from chemas import Ticker
+from schemas import Ticker
 
 
 #создание,подключение к базе данных
