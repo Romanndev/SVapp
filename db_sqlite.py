@@ -1,30 +1,27 @@
 import sqlite3
 from contextlib import contextmanager
+from typing import Any
 
-from schemas import Ticker
+from schemas import Ticker, ticker_info
 
 
 @contextmanager
 def get_db_connection():
         conn = sqlite3.connect('tickers.db')
         create_table(conn.cursor())
-        yield conn
-        conn.commit()
-        conn.close()
+        try:
+            yield conn
+            conn.commit()
+            conn.close()
+        finally:
+            conn.close()
         
-
-
-#создание,подключение к базе данных
-#def create_db():
-##    conn = sqlite3.connect('tickers.db')
-#    cur = conn.cursor()
-#    return cur
-
+      
 # создание таблицы
 def create_table(cur):
     try :
         cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
-                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, 
+                id INTEGER PRIMARY KEY UNIQUE, 
                 ticker TEXT UNIQUE,
                 fullname TEXT UNIQUE,
                 price REAL,
@@ -32,19 +29,27 @@ def create_table(cur):
                 truePrice REAL, 
                 status TEXT)
                 ''')
-        cur.execute('''DELETE FROM Tickers''')
+        #cur.execute('''DELETE FROM Tickers''')
     
     except sqlite3.Error as e:
         print(f"Error, table creation: {e}")
 
 # чтение по ID
-def read_by_id(cur, id):
+def read_by_id(cur, id)->dict[str: Any]:
     cur.execute('''SELECT * FROM Tickers WHERE id=?''',(id,))
     row = cur.fetchone()
-    return row
+    return {
+            'id': row[0],
+            'ticker': row[1],
+            'fullname': row[2],
+            'price': row[3],
+            'currency': row[4],
+            'truePrice': row[5], 
+            'status': row[6]
+            }
 
 # добавление записи по ID
-def add_record(cur, conn, ticker: Ticker):
+def add_record(cur, conn, ticker: Ticker)->dict[str: Any]:
     ticker_lable = ticker.ticker
     fullname = ticker.fullname
     price = ticker.price
@@ -56,8 +61,16 @@ def add_record(cur, conn, ticker: Ticker):
     cur.execute('''SELECT * FROM Tickers WHERE ticker=?''',(ticker_lable,))
     row = cur.fetchone() 
     conn.commit()
-    
-    return row
+    print('all good')
+    return {
+                'id': row[0],
+                'ticker': row[1],
+                'fullname': row[2],
+                'price': row[3],
+                'currency': row[4],
+                'truePrice': row[5], 
+                'status': row[6]
+                }
 
 # редактирование записи по ID
 #def edit_record(cur, id, ticker_date :Ticker):
@@ -66,11 +79,9 @@ def add_record(cur, conn, ticker: Ticker):
 #def update_all_date(cur, all_companies):
 
 # удаление записи по ID
-def deelete_record(cur,conn, id):
-    cur.exeute('''DELETE FROM Tickers WHERE id=?''',(id,))
+def delete_record(cur,conn, id):
+    cur.execute('''DELETE FROM Tickers WHERE id=?''',(id,))
     conn.commit()
-
-    return {'status': f'row with {id} deleted'}
 
 # запись и закрытие базы данных
 def save_an_close_db(cur, conn):
