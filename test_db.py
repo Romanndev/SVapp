@@ -9,4 +9,7 @@ app = FastAPI()
 @app.get("/get_ticker/{ticker_id}")
 def get_ticker(ticker_id: int):
 
-    with get_
+    with db_sqlite.get_db_connection as con:
+        
+
+    
