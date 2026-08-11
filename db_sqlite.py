@@ -29,8 +29,7 @@ def create_table(cur):
                 truePrice REAL, 
                 status TEXT)
                 ''')
-        #cur.execute('''DELETE FROM Tickers''')
-    
+           
     except sqlite3.Error as e:
         print(f"Error, table creation: {e}")
 
@@ -61,7 +60,6 @@ def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
     cur.execute('''SELECT * FROM Tickers WHERE ticker=?''',(ticker_lable,))
     row = cur.fetchone() 
     conn.commit()
-    print('all good')
     return {
                 'id': row[0],
                 'ticker': row[1],
@@ -73,8 +71,19 @@ def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
                 }
 
 # редактирование записи по ID
-#def edit_record(cur, id, ticker_date :Ticker):
-
+def edit_record(cur, id, status)->dict[str, Any]:
+    cur.execute('''UPDATE Tickers SET status=?''',(status,))
+    cur.execute('''SELECT * FROM Tickers WHERE id=?''', (id,))
+    row = cur.fetchone()
+    return {
+                'id': row[0],
+                'ticker': row[1],
+                'fullname': row[2],
+                'price': row[3],
+                'currency': row[4],
+                'truePrice': row[5], 
+                'status': row[6]
+                }
 # обновление всех записей в таблице
 #def update_all_date(cur, all_companies):
 
