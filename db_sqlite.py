@@ -35,7 +35,7 @@ def create_table(cur):
         print(f"Error, table creation: {e}")
 
 # чтение по ID
-def read_by_id(cur, id)->dict[str: Any]:
+def read_by_id(cur, id)->dict[str, Any]:
     cur.execute('''SELECT * FROM Tickers WHERE id=?''',(id,))
     row = cur.fetchone()
     return {
@@ -49,7 +49,7 @@ def read_by_id(cur, id)->dict[str: Any]:
             }
 
 # добавление записи по ID
-def add_record(cur, conn, ticker: Ticker)->dict[str: Any]:
+def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
     ticker_lable = ticker.ticker
     fullname = ticker.fullname
     price = ticker.price
