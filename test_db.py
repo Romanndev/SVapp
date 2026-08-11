@@ -1,10 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 
-import stocks_valuation as sv
-
 import db_sqlite as db
 import schemas
+import stocks_valuation as sv
 
 app = FastAPI()
 
@@ -40,7 +39,7 @@ def upload():
 #@app.post("/ticker/update_all")
 
 @app.patch("/ticker/update/{status}")
-def update_status(id,status):
+def update_status(id:int,status:str):
     with db.get_db_connection() as conn:
         cur = conn.cursor()
         row = db.edit_record(cur,id,status)
