@@ -8,16 +8,15 @@ import stocks_valuation as sv
 
 app = FastAPI()
 
-
-@app.get("/ticker/ticker_name/{ticker}", response_model=schemas.ticker_info)   
-def get_ticker_by_name(ticker:str):
+#обновление данных по всем тикерам в БД
+@app.post("/ticker/update_all")
+def update_all_tickers():
     with db.get_db_connection() as conn:
-        cur = conn.cursor()
-        ticker = ticker.upper()
-        row = db.read_by_ticker(cur, ticker)
+     cur = conn.cursor()
+     db.update_all(cur)
+    return {'status':'All data are updated'}
 
-        return row
-
+#список тикеров для покупки
 @app.get("/ticker/tickers_for_Buying", response_model=list[schemas.ticker_info])
 def tickers_for_buying():
     with db.get_db_connection() as conn:
@@ -26,17 +25,25 @@ def tickers_for_buying():
 
         return row
 
+#данные по тикеру
+@app.get("/ticker/ticker_name/{ticker}", response_model=schemas.ticker_info)   
+def get_ticker_by_name(ticker:str):
+    with db.get_db_connection() as conn:
+        cur = conn.cursor()
+        ticker = ticker.upper()
+        row = db.read_by_ticker(cur, ticker)
+        return row
 
-        
+#добавление нового тикера        ДОРАБОТАЙ СО СБРОВ ПАРАМЕТРОВ АВТОМАТИЧЕСКИ, ПОЛУЧАТЬ ОТ ПОЛЬЗОВАТЕЛЯ ТИКЕР
 @app.post("/ticker/create", response_model=schemas.ticker_info)
 def create_ticker(ticker:schemas.Ticker):
     with db.get_db_connection() as conn:
         cur = conn.cursor()
         row = db.add_record(cur, conn, ticker)
         cur.close()
-
         return row
 
+#загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
 @app.post("/ticker/upload_from_file") 
 def upload_tickers():
     with db.get_db_connection() as conn:
@@ -45,22 +52,9 @@ def upload_tickers():
      list_of_tickers = sv.upload_tickers_from_file(file_name)
      companies = sv.companies_data(list_of_tickers)
      sv.record_data(cur, companies)
-
      return {'status': 'data is loaded'} 
-     
-#обновление данных по всем тикерам в БД
-@app.post("/ticker/update_all")
-def update_all_tickers():
-    with db.get_db_connection() as conn:
-     cur = conn.cursor()
-     db.update_all(cur)
-
-    return {'status':'All data are updated'}
-     
-
-
-
-
+   
+#обновление статуча по тикеры, на усмотрение пользователя
 @app.patch("/ticker/update/{status}")
 def update_status(id:int,status:str):
     with db.get_db_connection() as conn:
@@ -69,6 +63,7 @@ def update_status(id:int,status:str):
         cur.close()
         return row    
 
+#удаление тикера из БД
 @app.delete("/ticker/delete/{id}")
 def delete_ticker(id):
     with db.get_db_connection() as conn:
@@ -85,7 +80,7 @@ def get_scalar_docs():
                 title="Scalar API",
         )
 
-#ticker по ID
+#получение данных по тикеру по ID
 @app.get("/ticker/{id}", response_model=schemas.ticker_info)
 def get_ticker(id: int):
     with db.get_db_connection() as conn:

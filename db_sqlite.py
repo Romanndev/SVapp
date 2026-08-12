@@ -129,28 +129,26 @@ def tickers_for_buying(cur):
 
     return result    
 
+#обновление данных по все тикерам в БД
 def update_all(cur):
     tickers_lable = []
-    param = []
+    company_data = {}
+    
 
     cur.execute('''SELECT ticker FROM Tickers''')
-    tickers_lable = cur.fetchall()
-    for i in tickers_lable:
-      print(i)
+    for i in cur.fetchall():
+      tickers_lable.append(i[0])
 
-    # Создаем сессию requests и маскируемся под обычный браузер
-    # Create a requests session and disguise it as a regular browser
-    session = requests.Session()
-    session.headers.update({
-               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-            })
+    company_data = sv.companies_data(tickers_lable)
+    for ticker, param in company_data.items():  
+        if  param[5] is None or param[1] is None:
+            cur.execute('''UPDATE Tickers SET price=?,truePrice=?,status=? WHERE ticker=?''',(param[1],param[5],'NO',ticker))
 
-    for i in tickers_lable:
-        param = sv.parameters(i,session)
-        if param[3] < param[5]:
-            cur.execute('''UPDATE Tickers SET price=?,truePrice?,status=?''',(param[3],param[5],'YES'))
-        else:
-            cur.execute('''UPDATE Tickers SET price=?,truePrice?,status=?''',(param[3],param[5],'NO'))
+        elif param[1]< param[5]:
+            cur.execute('''UPDATE Tickers SET price=?,truePrice=?,status=? WHERE ticker=?''',(param[1],param[5],'YES',ticker))
+
+        elif param[1]> param[5]:
+                    cur.execute('''UPDATE Tickers SET price=?,truePrice=?,status=? WHERE ticker=?''',(param[1],param[5],'NO',ticker))    
 
 
         
