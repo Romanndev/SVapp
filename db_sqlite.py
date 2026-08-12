@@ -2,7 +2,9 @@ import sqlite3
 from contextlib import contextmanager
 from typing import Any
 
-from schemas import Ticker, ticker_info
+from schemas import Ticker
+import stocks_valuation as sv
+import requests
 
 
 @contextmanager
@@ -46,6 +48,21 @@ def read_by_id(cur, id)->dict[str, Any]:
             'truePrice': row[5], 
             'status': row[6]
             }
+#чтение по Name
+def read_by_ticker(cur,ticker:str)->dict[str,Any]:
+    cur.execute('''SELECT * FROM Tickers WHERE ticker=?''',(ticker,))
+    row =cur.fetchone()
+
+    return {
+                'id': row[0],
+                'ticker': row[1],
+                'fullname': row[2],
+                'price': row[3],
+                'currency': row[4],
+                'truePrice': row[5], 
+                'status': row[6]
+                }
+
 
 # добавление записи по ID
 def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
@@ -92,11 +109,54 @@ def delete_record(cur,conn, id):
     cur.execute('''DELETE FROM Tickers WHERE id=?''',(id,))
     conn.commit()
 
-# запись и закрытие базы данных
-def save_an_close_db(cur, conn):
-    conn.commit()
-    cur.close()
-    conn.close()
+#тикеры для покупки
+def tickers_for_buying(cur):
+    cur.execute('''SELECT * FROM Tickers WHERE status=?''',('YES',))
+    rows = cur.fetchall()
+
+    result = []
+
+    for row in rows:
+        result.append({
+                    'id': row[0],
+                    'ticker': row[1],
+                    'fullname': row[2],
+                    'price': row[3],
+                    'currency': row[4],
+                    'truePrice': row[5], 
+                    'status': row[6]
+                    })
+
+    return result    
+
+def update_all(cur):
+    tickers_lable = []
+    param = []
+
+    cur.execute('''SELECT ticker FROM Tickers''')
+    tickers_lable = cur.fetchall()
+    for i in tickers_lable:
+      print(i)
+
+    # Создаем сессию requests и маскируемся под обычный браузер
+    # Create a requests session and disguise it as a regular browser
+    session = requests.Session()
+    session.headers.update({
+               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            })
+
+    for i in tickers_lable:
+        param = sv.parameters(i,session)
+        if param[3] < param[5]:
+            cur.execute('''UPDATE Tickers SET price=?,truePrice?,status=?''',(param[3],param[5],'YES'))
+        else:
+            cur.execute('''UPDATE Tickers SET price=?,truePrice?,status=?''',(param[3],param[5],'NO'))
+
+
+        
+
+
+
 
 
 # сохранить полученные данные и оценку привлекательности к покупке тикеров 
