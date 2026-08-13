@@ -2,9 +2,8 @@ import sqlite3
 from contextlib import contextmanager
 from typing import Any
 
-from schemas import Ticker
 import stocks_valuation as sv
-import requests
+from schemas import Ticker
 
 
 @contextmanager
@@ -48,6 +47,7 @@ def read_by_id(cur, id)->dict[str, Any]:
             'truePrice': row[5], 
             'status': row[6]
             }
+
 #чтение по Name
 def read_by_ticker(cur,ticker:str)->dict[str,Any]:
     cur.execute('''SELECT * FROM Tickers WHERE ticker=?''',(ticker,))
@@ -62,7 +62,6 @@ def read_by_ticker(cur,ticker:str)->dict[str,Any]:
                 'truePrice': row[5], 
                 'status': row[6]
                 }
-
 
 # добавление записи по ID
 def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
@@ -101,8 +100,6 @@ def edit_record(cur, id, status)->dict[str, Any]:
                 'truePrice': row[5], 
                 'status': row[6]
                 }
-# обновление всех записей в таблице
-#def update_all_date(cur, all_companies):
 
 # удаление записи по ID
 def delete_record(cur,conn, id):
@@ -149,30 +146,3 @@ def update_all(cur):
 
         elif param[1]> param[5]:
                     cur.execute('''UPDATE Tickers SET price=?,truePrice=?,status=? WHERE ticker=?''',(param[1],param[5],'NO',ticker))    
-
-
-        
-
-
-
-
-
-# сохранить полученные данные и оценку привлекательности к покупке тикеров 
-# save the obtained data and the assessment of the attractiveness of purchasing tickers
-
-    
-
-    
-
-#    for name,param in all_companies.items() :
-# 
-#        if param[5] is None or param[1] > param[5] :
-#            status = 'NO'
-#        else:
-#            status = 'YES'
-#    
-#        cur.execute('INSERT OR IGNORE INTO Tickers(id,ticker,fullname,price,currency,truePrice,status) VALUES (?,?,?,?,?,?,?)',(None,name,param[0],param[1],param[2],param[5],status))
-# 
-#
-#    conn.commit()
-#    conn.close()
