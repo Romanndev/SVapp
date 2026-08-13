@@ -1,5 +1,4 @@
 import math
-import sqlite3
 
 import requests
 import yfinance as yf
@@ -10,7 +9,7 @@ Graham_Multiplier = 22.5
 # функция рассчитывает справедливую стоимость акции по формуле Грэма, по заданным параметрам. ВОЗВРАЩАЕТ ЧИСЛО Грэма или None
 # The function calculates the fair value of a share using Graham's formula, given the specified parameters. It returns the Graham number or None
 #-------------------------------------------------------------------------------------
-def graham_value(eps,bvps)->float :
+def graham_value(eps,bvps)->float | None:
     if eps is None or bvps is None or eps <=0 or bvps <=0 :     
         return None
     else :    
