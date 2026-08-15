@@ -30,9 +30,8 @@ def parameters (ticker_name, session)->list | None :
     try:
         info = stock.info
     
-    except Exception as e:  # noqa: BLE001
-        print(f"❌ Error loading yfinance data for [{ticker_name}]: {e}")
-        return None
+    except requests.exceptions.RequestException:
+         return None
     
     #HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: QWERTY.TO"}}}
   
@@ -54,7 +53,7 @@ def parameters (ticker_name, session)->list | None :
     
     try:                 
         list_parameters.append(round(bvps,2))     
-    except : 
+    except (TypeError, ValueError): 
         list_parameters.append(None)
         
     return list_parameters
@@ -71,15 +70,16 @@ def upload_tickers_from_file(file_name)->list:
          for i in fh :
             ticker_name = i    
             ticker_name = ticker_name.strip().upper()
+            if not ticker_name:
+                 continue
             ticker_name = ticker_name.replace('/','-')
             #ticker_name = ticker_name.replace('-','.')
             ticker_name = ticker_name +'.TO'
             list_of_tickers.append(ticker_name)
 
-    except:
-        print('Error opening file. File list_of_tickers.txt not found. Please create a file with tickers in the same directory as the script and try again.')
-        exit()
-
+    except FileNotFoundError:
+           raise FileNotFoundError(f"File '{file_name}' not found in the script directory.")
+           
     return list_of_tickers
 
 #-------------------------------------------------------------------------------------

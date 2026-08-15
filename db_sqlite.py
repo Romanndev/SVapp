@@ -16,15 +16,14 @@ def get_db_connection():
             conn.close()
         finally:
             conn.close()
-        
-      
+              
 # создание таблицы
 def create_table(cur):
     try :
         cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
                 id INTEGER PRIMARY KEY UNIQUE, 
                 ticker TEXT UNIQUE,
-                fullname TEXT UNIQUE,
+                fullname TEXT,
                 price REAL,
                 currency TEXT,
                 truePrice REAL, 
@@ -32,7 +31,8 @@ def create_table(cur):
                 ''')
            
     except sqlite3.Error as e:
-        print(f"Error, table creation: {e}")
+        raise sqlite3.OperationalError(f"Error, table creation: '{e}'")
+        
 
 # чтение по ID
 def read_by_id(cur, id)->dict[str, Any]:
@@ -88,7 +88,7 @@ def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
 
 # редактирование записи по ID
 def edit_record(cur, id, status)->dict[str, Any]:
-    cur.execute('''UPDATE Tickers SET status=?''',(status,))
+    cur.execute('''UPDATE Tickers SET status=? WHERE id=?''',(status,id))
     cur.execute('''SELECT * FROM Tickers WHERE id=?''', (id,))
     row = cur.fetchone()
     return {
