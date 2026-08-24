@@ -1,7 +1,9 @@
 import math
+import time
 
 import requests
 import yfinance as yf
+from yfinance.exceptions import YFRateLimitError
 
 Graham_Multiplier = 22.5
 
@@ -19,8 +21,8 @@ def graham_value(eps,bvps)->float | None:
     return GRAHAM_NUMBERS
 
 #-------------------------------------------------------------------------------------
-# функция собирает параметры для расчета формул Грэма
-# The function collects parameters for calculating Graham's formulas
+# функция собирает параметры по ТИКЕРУ для расчета формул Грэма
+# The function collects parameters by TICKER to calculate Graham's formulas
 #-------------------------------------------------------------------------------------
 def parameters (ticker_name, session)->list | None :
 
@@ -89,8 +91,8 @@ def upload_tickers_from_file(file_name)->list:
 def companies_data(list_of_tickers)->dict:
     all_companies = {}
 
-    # Создаем сессию requests и маскируемся под обычный браузер
-    # Create a requests session and disguise it as a regular browser
+# Создаем сессию requests и маскируемся под обычный браузер
+# Create a requests session and disguise it as a regular browser
     session = requests.Session()
     session.headers.update({
            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
@@ -100,7 +102,16 @@ def companies_data(list_of_tickers)->dict:
     # Get ticker parameters and calculate fair value
     
     for i in list_of_tickers :
-        CompanyData = parameters (i,session)
+# защита от лимитов обращений
+# protection against access limits
+        for step in range(3):
+            try:
+               CompanyData = parameters (i,session)
+               break
+            except YFRateLimitError: 
+                     time.sleep(7)
+                     if step == 3:   CompanyData = None  
+
         if CompanyData is not None :
             eps = CompanyData[3]
             bvps = CompanyData[4]
@@ -108,7 +119,8 @@ def companies_data(list_of_tickers)->dict:
             CompanyData.append(gvalue)
             all_companies[i] = CompanyData 
         else:
-            all_companies[i] = ['not found', None, None, None, None, None]
+                all_companies[i] = ['not found', None, None, None, None, None]
+        
     return all_companies
 
 def record_data(cur, all_companies):
