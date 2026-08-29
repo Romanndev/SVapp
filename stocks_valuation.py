@@ -98,12 +98,13 @@ def companies_data(list_of_tickers)->dict:
            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         })
     
-    # получить параметры по тикерам, рассчитывать справедливую стоимость
-    # Get ticker parameters and calculate fair value
+# получить параметры по тикерам, рассчитывать справедливую стоимость
+# Get ticker parameters and calculate fair value
     
     for i in list_of_tickers :
 # защита от лимитов обращений
 # protection against access limits
+        
         for step in range(3):
             try:
                CompanyData = parameters (i,session)
@@ -120,6 +121,7 @@ def companies_data(list_of_tickers)->dict:
             all_companies[i] = CompanyData 
         else:
                 all_companies[i] = ['not found', None, None, None, None, None]
+
         
     return all_companies
 
