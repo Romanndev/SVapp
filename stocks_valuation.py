@@ -149,7 +149,7 @@ async def companies_data(list_of_tickers)->dict:
     task_list = []
     async with asyncio.TaskGroup() as tg:
         for i in list_of_tickers :
-            task = tg.create_task(asyncio.to_thread(parameters, i, session))
+            task = await tg.create_task(asyncio.to_thread(parameters, i, session))
             task_list.append(task)
 
     companies_parameters_list = (task.result() for task in task_list)
