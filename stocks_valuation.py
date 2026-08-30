@@ -149,10 +149,11 @@ async def companies_data(list_of_tickers)->dict:
     task_list = []
     async with asyncio.TaskGroup() as tg:
         for i in list_of_tickers :
-            task = await tg.create_task(asyncio.to_thread(parameters, i, session))
+            task = tg.create_task(asyncio.to_thread(parameters, i, session))
             task_list.append(task)
+            await asyncio.sleep(0.2)
 
-    companies_parameters_list = (task.result() for task in task_list)
+    companies_parameters_list = [task.result() for task in task_list]
 
 # рассчет справедливой стоимость по тикеру 
 # calculation of fair value by ticker   
