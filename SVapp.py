@@ -35,12 +35,14 @@ def ticker_info_by_name(ticker:str):
         return row
 
 #добавление нового тикера        ДОРАБОТАЙ СО СБРОВ ПАРАМЕТРОВ АВТОМАТИЧЕСКИ, ПОЛУЧАТЬ ОТ ПОЛЬЗОВАТЕЛЯ ТИКЕР
-@app.post("/ticker/create_ticker_in_db", response_model=schemas.ticker_info)
-def create_ticker_in_db(ticker:schemas.Ticker):
-    with db.get_db_connection() as conn:
-        cur = conn.cursor()
-        row = db.add_record(cur, conn, ticker)
-        cur.close()
+@app.post("/ticker/create_ticker_in_db/{ticker}", response_model=schemas.ticker_info)
+def create_ticker_in_db(ticker:str):
+        with db.get_db_connection() as conn:
+            cur = conn.cursor()
+# def обработка тикера, сделать большими бувками и добаить .TO
+            date_in_DB = sv.ticker_full_date_for_DB(ticker)    
+            row = db.add_record(cur, conn, date_in_DB)
+            cur.close()
         return row
 
 #загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД

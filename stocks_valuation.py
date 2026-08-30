@@ -5,6 +5,9 @@ import requests
 import yfinance as yf
 from yfinance.exceptions import YFRateLimitError
 
+import schemas
+from schemas import Ticker
+
 Graham_Multiplier = 22.5
 
 #-------------------------------------------------------------------------------------
@@ -58,8 +61,49 @@ def parameters (ticker_name, session)->list | None :
     except (TypeError, ValueError): 
         list_parameters.append(None)
 
-    return list_parameters
+    return list_parameters # [longName,currentPrice,currency, eps, bvps]
 
+#-------------------------------------------------------------------------------------
+# 
+#-------------------------------------------------------------------------------------
+def ticker_full_date_for_DB(ticker_name:str)->Ticker:
+# Создаем сессию requests и маскируемся под обычный браузер
+# Create a requests session and disguise it as a regular browser
+    session = requests.Session()
+    session.headers.update({
+           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        })
+    
+    company_parameters = parameters(ticker_name,session)
+    if company_parameters is not None :
+        eps = company_parameters[3]
+        bvps = company_parameters[4]
+        gvalue = graham_value(eps,bvps)
+        return schemas.Ticker(
+        ticker = ticker_name,
+        fullname = company_parameters[0],
+        price = company_parameters[1],
+        currency = company_parameters[2],
+        truePrice = gvalue,
+        status = status_by_company(company_parameters[1], gvalue)
+        )
+                     
+    else:
+        return schemas.Ticker(
+        ticker = ticker_name,
+        fullname = 'not found',
+        price = None,
+        currency = None,
+        truePrice = None,
+        status = 'NO'
+        )
+
+def status_by_company(price:float | None, truePrice:float | None)->str:
+     if truePrice is None or price is None or price > truePrice: status = 'No' 
+     else:status = 'YES'
+
+     return status    
+        
 #-------------------------------------------------------------------------------------
 # загрузка списка тикеров из файла
 # Loading a list of tickers from a file

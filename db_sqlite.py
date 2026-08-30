@@ -33,7 +33,6 @@ def create_table(cur):
     except sqlite3.Error as e:
         raise sqlite3.OperationalError(f"Error, table creation: '{e}'")
         
-
 # чтение по ID
 def read_by_id(cur, id)->dict[str, Any]:
     cur.execute('''SELECT * FROM Tickers WHERE id=?''',(id,))
@@ -50,6 +49,7 @@ def read_by_id(cur, id)->dict[str, Any]:
 
 #чтение по Name
 def read_by_ticker(cur,ticker:str)->dict[str,Any]:
+# доработать проверку на отсутствие тикера в БД    
     cur.execute('''SELECT * FROM Tickers WHERE ticker=?''',(ticker,))
     row =cur.fetchone()
 
