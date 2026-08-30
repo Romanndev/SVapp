@@ -127,7 +127,7 @@ def tickers_for_buying(cur):
     return result    
 
 #обновление данных по все тикерам в БД
-def update_all(cur):
+async def update_all(cur):
     tickers_lable = []
     company_data = {}
     
@@ -136,7 +136,7 @@ def update_all(cur):
     for i in cur.fetchall():
       tickers_lable.append(i[0])
 
-    company_data = sv.companies_data(tickers_lable)
+    company_data = await sv.companies_data(tickers_lable)
     for ticker, param in company_data.items():  
         if  param[5] is None or param[1] is None:
             cur.execute('''UPDATE Tickers SET price=?,truePrice=?,status=? WHERE ticker=?''',(param[1],param[5],'NO',ticker))

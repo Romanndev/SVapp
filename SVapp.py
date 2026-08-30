@@ -10,10 +10,10 @@ app = FastAPI()
 
 #обновление данных по всем тикерам в БД
 @app.post("/ticker/update_all_tickers")
-def update_all_tickers():
+async def update_all_tickers():
     with db.get_db_connection() as conn:
      cur = conn.cursor()
-     db.update_all(cur)
+     await db.update_all(cur)
     return {'status':'All data are updated'}
 
 #список тикеров для покупки

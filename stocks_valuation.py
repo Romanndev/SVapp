@@ -1,5 +1,5 @@
+import asyncio
 import math
-import time
 
 import requests
 import yfinance as yf
@@ -21,8 +21,8 @@ def graham_value(eps,bvps)->float | None:
     return GRAHAM_NUMBERS
 
 #-------------------------------------------------------------------------------------
-# функция собирает параметры по ТИКЕРУ для расчета формул Грэма
-# The function collects parameters by TICKER to calculate Graham's formulas
+# функция собирает параметры по ТИКЕРУ для расчета формулы Грэма (синхронная функция с синхронной библиотекой yfinance)
+# The function collects parameters by TICKER to calculate the Graham formula (synchronous function with the synchronous library yfinance)
 #-------------------------------------------------------------------------------------
 def parameters (ticker_name, session)->list | None :
 
@@ -57,7 +57,7 @@ def parameters (ticker_name, session)->list | None :
         list_parameters.append(round(bvps,2))     
     except (TypeError, ValueError): 
         list_parameters.append(None)
-        
+
     return list_parameters
 
 #-------------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ def upload_tickers_from_file(file_name)->list:
 #группируем данные по отдельным компаниям
 #grouping data by individual companies  
 #-------------------------------------------------------------------------------------
-def companies_data(list_of_tickers)->dict:
+async def companies_data(list_of_tickers)->dict:
     all_companies = {}
 
 # Создаем сессию requests и маскируемся под обычный браузер
@@ -98,21 +98,23 @@ def companies_data(list_of_tickers)->dict:
            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         })
     
-# получить параметры по тикерам, рассчитывать справедливую стоимость
-# Get ticker parameters and calculate fair value
-    
-    for i in list_of_tickers :
-# защита от лимитов обращений
-# protection against access limits
-        
-        for step in range(3):
-            try:
-               CompanyData = parameters (i,session)
-               break
-            except YFRateLimitError: 
-                     time.sleep(7)
-                     if step == 3:   CompanyData = None  
+# получаем параметры по тикерам в асинхноррном режиме
+# get ticker parameters in asynchronous mode
 
+#    time_start = time.perf_counter()
+    task_list = []
+    async with asyncio.TaskGroup() as tg:
+        for i in list_of_tickers :
+            task = tg.create_task(asyncio.to_thread(parameters, i, session))
+            task_list.append(task)
+
+    companies_parameters_list = (task.result() for task in task_list)
+
+# рассчет справедливой стоимость по тикеру 
+# calculation of fair value by ticker   
+    for i,y in zip(list_of_tickers, companies_parameters_list):
+        CompanyData = y 
+            
         if CompanyData is not None :
             eps = CompanyData[3]
             bvps = CompanyData[4]
@@ -122,7 +124,9 @@ def companies_data(list_of_tickers)->dict:
         else:
                 all_companies[i] = ['not found', None, None, None, None, None]
 
-        
+#    time_finish = time.perf_counter()
+#    print(f"total work time {time_finish-time_start} seconds")
+
     return all_companies
 
 def record_data(cur, all_companies):
