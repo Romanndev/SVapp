@@ -9,12 +9,12 @@ import stocks_valuation as sv
 app = FastAPI()
 
 #обновление данных по всем тикерам в БД
-@app.post("/ticker/update_all_tickers")
-async def update_all_tickers():
-    with db.get_db_connection() as conn:
-     cur = conn.cursor()
-     await db.update_all(cur)
-    return {'status':'All data are updated'}
+#@app.post("/ticker/update_all_tickers")
+#async def update_all_tickers():
+#    with db.get_db_connection() as conn:
+#     cur = conn.cursor()
+#     await db.update_all(cur)
+#    return {'status':'All data are updated'}
 
 #список тикеров для покупки
 @app.get("/ticker/tickers_for_buying", response_model=list[schemas.ticker_info])
@@ -46,17 +46,17 @@ def create_ticker_in_db(ticker:str):
         return row
 
 #загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
-@app.post("/ticker/upload_tickers_from_file") 
-def upload_tickers_from_file():
-    with db.get_db_connection() as conn:
-     cur = conn.cursor()
-     file_name = 'list_of_tickers.txt'
-     list_of_tickers = sv.upload_tickers_from_file(file_name)
-     companies = sv.companies_data(list_of_tickers)
-     sv.record_data(cur, companies)
-     return {'status': 'data is loaded'} 
+#@app.post("/ticker/upload_tickers_from_file") 
+#def upload_tickers_from_file():
+#    with db.get_db_connection() as conn:
+#     cur = conn.cursor()
+#     file_name = 'list_of_tickers.txt'
+#     list_of_tickers = sv.upload_tickers_from_file(file_name)
+#     companies = sv.companies_data(list_of_tickers)
+#     sv.record_data(cur, companies)
+#     return {'status': 'data is loaded'} 
    
-#обновление статуса по тикеры, на усмотрение пользователя
+#обновление статуса по тикерам, на усмотрение пользователя
 @app.patch("/ticker/update_status/{id}")
 def update_status(id:int,status:str):
     with db.get_db_connection() as conn:
