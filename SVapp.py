@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from scalar_fastapi import get_scalar_api_reference
 
-import db_sqlite as db
+import db_svapp as db
 import schemas
 import stocks_valuation as sv
 
@@ -25,7 +25,7 @@ def tickers_for_buying():
 
         return row
 
-#данные по тикеру
+#данные по тикерам
 @app.get("/ticker/ticker_info_by_name/{ticker}", response_model=schemas.ticker_info)   
 def ticker_info_by_name(ticker:str):
     with db.get_db_connection() as conn:
@@ -40,37 +40,38 @@ def create_ticker_in_db(ticker:str):
         with db.get_db_connection() as conn:
             cur = conn.cursor()
 # def обработка тикера, сделать большими бувками и добаить .TO
-            date_in_DB = sv.ticker_full_date_for_DB(ticker)    
-            row = db.add_record(cur, conn, date_in_DB)
+            date_for_DB = sv.ticker_full_date_for_DB(ticker)    
+            row = db.add_record(cur, conn, date_for_DB)
             cur.close()
         return row
 
-#загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
-@app.post("/ticker/upload_tickers_from_file") 
-async def upload_tickers_from_file():
-    with db.get_db_connection() as conn:
-     cur = conn.cursor()
-     file_name = 'list_of_tickers.txt'
-     list_of_tickers = sv.upload_tickers_from_file(file_name)
-     companies = await sv.companies_data(list_of_tickers)
-     sv.record_data(cur, companies)
-     return {'status': 'data is loaded'} 
+# загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
+# функция рабочая, НО ОТКЛЮЧЕНА
+# @app.post("/ticker/upload_tickers_from_file") 
+# async def upload_tickers_from_file():
+#     with db.get_db_connection() as conn:
+#      cur = conn.cursor()
+#      file_name = 'list_of_tickers.txt'
+#      list_of_tickers = sv.upload_tickers_from_file(file_name)
+#      companies = await sv.companies_data(list_of_tickers)
+#      sv.record_data(cur, companies)
+#      return {'status': 'data is loaded'} 
    
 #обновление статуса по тикерам, на усмотрение пользователя
-@app.patch("/ticker/update_status/{id}")
-def update_status(id:int,status:str):
+@app.patch("/ticker/update_status/{ticker}")
+def update_status(ticker:str,status:str):
     with db.get_db_connection() as conn:
         cur = conn.cursor()
-        row = db.edit_record(cur,id,status)
+        row = db.edit_record(cur,ticker,status)
         cur.close()
         return row    
 
-#удаление тикера из БД
-@app.delete("/ticker/delete_ticker/{id}")
-def delete_ticker(id):
+#удаление тикеров из БД
+@app.delete("/ticker/delete_ticker/{ticker}")
+def delete_ticker(ticker:str):
     with db.get_db_connection() as conn:
        cur = conn.cursor()
-       db.delete_record(cur,conn,id)
+       db.delete_record(cur,conn,ticker)
        cur.close()
        return  {'status': 'deleted'}
 
