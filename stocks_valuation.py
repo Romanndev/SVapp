@@ -174,7 +174,7 @@ async def companies_data(list_of_tickers)->dict:
 
     return all_companies
 
-def record_data(cur, all_companies):
+def record_data(cur, all_companies:dict):
     
     for name,param in all_companies.items() :
      
@@ -183,7 +183,9 @@ def record_data(cur, all_companies):
             else:
                 status = 'YES'
         
-            cur.execute('INSERT OR IGNORE INTO Tickers(ticker,fullname,price,currency,truePrice,status) VALUES (?,?,?,?,?,?)',(name,param[0],param[1],param[2],param[5],status))
+            cur.execute('INSERT INTO Tickers(ticker,fullname,price,currency,truePrice,status) ' \
+            'VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING',
+            (name,param[0],param[1],param[2],param[5],status))
      
     
         

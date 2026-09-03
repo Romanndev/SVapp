@@ -46,15 +46,15 @@ def create_ticker_in_db(ticker:str):
         return row
 
 #загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
-#@app.post("/ticker/upload_tickers_from_file") 
-#def upload_tickers_from_file():
-#    with db.get_db_connection() as conn:
-#     cur = conn.cursor()
-#     file_name = 'list_of_tickers.txt'
-#     list_of_tickers = sv.upload_tickers_from_file(file_name)
-#     companies = sv.companies_data(list_of_tickers)
-#     sv.record_data(cur, companies)
-#     return {'status': 'data is loaded'} 
+@app.post("/ticker/upload_tickers_from_file") 
+async def upload_tickers_from_file():
+    with db.get_db_connection() as conn:
+     cur = conn.cursor()
+     file_name = 'list_of_tickers.txt'
+     list_of_tickers = sv.upload_tickers_from_file(file_name)
+     companies = await sv.companies_data(list_of_tickers)
+     sv.record_data(cur, companies)
+     return {'status': 'data is loaded'} 
    
 #обновление статуса по тикерам, на усмотрение пользователя
 @app.patch("/ticker/update_status/{id}")

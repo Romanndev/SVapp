@@ -1,6 +1,10 @@
-import sqlite3
+import os
+
+#import sqlite3
 from contextlib import contextmanager
 from typing import Any
+
+import psycopg2
 
 import stocks_valuation as sv
 from schemas import Ticker
@@ -8,8 +12,10 @@ from schemas import Ticker
 
 @contextmanager
 def get_db_connection():
-        conn = sqlite3.connect('tickers.db')
-        create_table(conn.cursor())
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        #conn = sqlite3.connect('tickers.db')
+        cur = conn.cursor()
+        create_table(cur)
         try:
             yield conn
             conn.commit()
@@ -18,20 +24,22 @@ def get_db_connection():
             conn.close()
               
 # создание таблицы
+#id INTEGER PRIMARY KEY UNIQUE,
 def create_table(cur):
     try :
         cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
-                id INTEGER PRIMARY KEY UNIQUE, 
+                id SERIAL PRIMARY KEY,
                 ticker TEXT UNIQUE,
                 fullname TEXT,
                 price REAL,
                 currency TEXT,
                 truePrice REAL, 
-                status TEXT)
+                status TEXT,
+                data DATE DEFAULT CURRENT_TIMESTAMP)
                 ''')
            
-    except sqlite3.Error as e:
-        raise sqlite3.OperationalError(f"Error, table creation: '{e}'")
+    except psycopg2.Error as e:
+        raise psycopg2.OperationalError(f"Error, table creation: '{e}'")
         
 # чтение по ID
 def read_by_id(cur, id)->dict[str, Any]:
