@@ -42,14 +42,26 @@ def create_table(cur):
 
 #чтение по Name
 def read_by_ticker(cur,ticker:str)->dict[str,Any]:
-# доработать проверку на отсутствие тикера в БД    
+# доработать проверку на отсутствие тикера в БД  
+    #ticker = sv.check_ticker_name(ticker)  
     cur.execute('''SELECT * FROM Tickers WHERE ticker=%s''',(ticker,))
+    
     row =cur.fetchone()
-    cur.execute("SELECT COUNT(*) FROM Tickers;")
-    count = cur.fetchone()[0]
-    print(count)
-
-    return {
+    if row is None:
+        return {
+                'id': None,
+                'ticker': None,
+                'fullname': None,
+                'price': None,
+                'currency': None,
+                'truePrice': None, 
+                'status': None
+                }
+    # cur.execute("SELECT COUNT(*) FROM Tickers;")
+    # count = cur.fetchone()[0]
+    # print(count)
+    else :
+        return {
                 'id': row[0],
                 'ticker': row[1],
                 'fullname': row[2],
