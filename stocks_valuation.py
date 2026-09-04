@@ -188,4 +188,5 @@ def record_data(cur, all_companies:dict):
             (name,param[0],param[1],param[2],param[5],status))
      
     
-        
+# def check_ticker_name(ticker):
+#     ticker          
