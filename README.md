@@ -1,6 +1,6 @@
 # SVapp
 
-**SVapp** (Stock Valuation App) is an automated stock valuation tool built with FastAPI that applies Benjamin Graham's formula to companies listed on the Toronto Stock Exchange (TSX). It fetches live financial data via yfinance, calculates fair value, and exposes the results through a REST API.
+**SVapp** (Stock Valuation App) is an automated stock valuation tool built with FastAPI that applies Benjamin Graham's formula to companies listed on the Toronto Stock Exchange (TSX). It fetches live financial data via yfinance, calculates fair value, and exposes the results through a REST API, storing data in a **CockroachDB Serverless** cluster.
 
 > ⚠️ **Disclaimer:** The calculation results are for informational purposes only and do not constitute financial advice.
 
@@ -8,9 +8,9 @@
 
 ## 🚀 How It Works
 
-1. **Data Reading:** Tickers are read from `list_of_tickers.txt` or added individually via the API.
+1. **Data Input:** Tickers are added individually via the API.
 2. **Data Parsing:** The app fetches financial metrics (EPS, BVPS, current price) from [Yahoo Finance](https://ca.finance.yahoo.com/) using `yfinance`, with a spoofed browser session to avoid rate limiting.
-3. **Calculation & Storage:** Fair value is calculated using Graham's formula, and results are stored in a local SQLite database (`tickers.db`).
+3. **Calculation & Storage:** Fair value is calculated using Graham's formula, and results are stored in a **CockroachDB Serverless** database via `psycopg2`.
 4. **API Access:** All data — updating, reading, filtering undervalued stocks — is exposed through a FastAPI REST API with Pydantic-validated schemas.
 
 ---
@@ -19,13 +19,12 @@
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/ticker/upload_tickers_from_file` | Loads tickers from file, fetches data, and saves to DB |
-| `POST` | `/ticker/update_all_tickers` | Refreshes data and valuation status for all tickers |
+| `GET` | `/` | Health check / root endpoint |
 | `GET` | `/ticker/tickers_for_buying` | Returns tickers currently flagged as undervalued |
 | `GET` | `/ticker/ticker_info_by_name/{ticker}` | Returns ticker data by symbol |
-| `POST` | `/ticker/create_ticker_in_db` | Adds a new ticker record manually |
-| `PATCH` | `/ticker/update_status/{id}` | Updates the status of a ticker |
-| `DELETE` | `/ticker/delete_ticker/{id}` | Removes a ticker record |
+| `POST` | `/ticker/create_ticker_in_db/{ticker}` | Adds a new ticker record by symbol, fetches data, and saves to DB |
+| `PATCH` | `/ticker/update_status/{ticker}` | Updates the status of a ticker by symbol |
+| `DELETE` | `/ticker/delete_ticker/{ticker}` | Removes a ticker record by symbol |
 | `GET` | `/get_scalar_docs` | Interactive API documentation (via Scalar) |
 
 ---
@@ -34,10 +33,13 @@
 
 - **Backend:** FastAPI + Uvicorn
 - **Data Validation:** Pydantic
-- **Database:** SQLite3
+- **Database:** [CockroachDB](https://www.cockroachlabs.com/) Serverless (`svapp-db`) — accessed via `psycopg2`
 - **Data Collection & Parsing:**
   * [`yfinance`](https://github.com/ranaroussi/yfinance) — fetches EPS, BVPS, and current price from Yahoo Finance
   * [`requests`](https://requests.readthedocs.io/) — custom session with spoofed headers to handle anti-bot restrictions
+- **Database Connectivity:**
+  * [`psycopg2`](https://www.psycopg.org/) — connects to CockroachDB (PostgreSQL wire protocol)
+  * [`python-dotenv`](https://github.com/theskumar/python-dotenv) — loads `DATABASE_URL` from `.env`
 - **API Docs:** [Scalar](https://github.com/scalar/scalar) — interactive API reference
 - **Mathematical Calculations:**
   * `math` — square root calculation for Graham's formula
@@ -80,8 +82,13 @@ Follow these steps to set up and run the application locally:
    pip install -r requirements.txt
    ```
 
-2. **Prepare the input file:**
-   Create a text file named `list_of_tickers.txt` in the root directory of the project and add your target Canadian tickers (e.g., `TD`, `LNR`), each on a new line.
+2. **Configure the database connection:**
+   Create a `.env` file in the root directory and add your [CockroachDB Serverless](https://www.cockroachlabs.com/) connection string for the `svapp-db` database (get it from the CockroachDB Cloud console → **Connect** → language **Python**, tool **Psycopg2**):
+   ```dotenv
+   DATABASE_URL = "postgresql://admin-svapp:PASSWORD@svapp-db-33183.j77.aws-us-east-1.cockroachlabs.cloud:26257/svapp-db?sslmode=verify-full&sslrootcert=system"
+   ```
+   Replace `PASSWORD` with your actual credentials. `sslrootcert=system` uses your OS's trusted certificate store, so there's no need to download or reference a separate CA cert file.
+   > 🔐 Never commit your `.env` file — make sure it's listed in `.gitignore`.
 
 3. **Launch the application:**
    Run the main script using Python:
