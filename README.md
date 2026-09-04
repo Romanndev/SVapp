@@ -23,7 +23,7 @@
 | `GET` | `/ticker/tickers_for_buying` | Returns tickers currently flagged as undervalued |
 | `GET` | `/ticker/ticker_info_by_name/{ticker}` | Returns ticker data by symbol |
 | `POST` | `/ticker/create_ticker_in_db/{ticker}` | Adds a new ticker record by symbol, fetches data, and saves to DB |
-| `PATCH` | `/ticker/update_status/{ticker}` | Updates the status of a ticker by symbol |
+| `PATCH` | `/ticker/update_status/{ticker}?status=...` | Updates the status of a ticker by symbol (`status` passed as a query parameter) |
 | `DELETE` | `/ticker/delete_ticker/{ticker}` | Removes a ticker record by symbol |
 | `GET` | `/get_scalar_docs` | Interactive API documentation (via Scalar) |
 
@@ -37,9 +37,9 @@
 - **Data Collection & Parsing:**
   * [`yfinance`](https://github.com/ranaroussi/yfinance) — fetches EPS, BVPS, and current price from Yahoo Finance
   * [`requests`](https://requests.readthedocs.io/) — custom session with spoofed headers to handle anti-bot restrictions
+  * `asyncio` (`TaskGroup` + `to_thread`) — fetches data for multiple tickers concurrently
 - **Database Connectivity:**
   * [`psycopg2`](https://www.psycopg.org/) — connects to CockroachDB (PostgreSQL wire protocol)
-  * [`python-dotenv`](https://github.com/theskumar/python-dotenv) — loads `DATABASE_URL` from `.env`
 - **API Docs:** [Scalar](https://github.com/scalar/scalar) — interactive API reference
 - **Mathematical Calculations:**
   * `math` — square root calculation for Graham's formula
@@ -83,12 +83,17 @@ Follow these steps to set up and run the application locally:
    ```
 
 2. **Configure the database connection:**
-   Create a `.env` file in the root directory and add your [CockroachDB Serverless](https://www.cockroachlabs.com/) connection string for the `svapp-db` database (get it from the CockroachDB Cloud console → **Connect** → language **Python**, tool **Psycopg2**):
-   ```dotenv
-   DATABASE_URL = "postgresql://admin-svapp:PASSWORD@svapp-db-33183.j77.aws-us-east-1.cockroachlabs.cloud:26257/svapp-db?sslmode=verify-full&sslrootcert=system"
+   The app reads the connection string directly from the `DATABASE_URL` environment variable (`os.environ["DATABASE_URL"]`) — there's no `.env` auto-loading, so it must be set in your shell or system environment before running the app. Get the connection string from the CockroachDB Cloud console → **Connect** → language **Python**, tool **Psycopg2**:
+   ```bash
+   # macOS/Linux
+   export DATABASE_URL="postgresql://admin-svapp:PASSWORD@svapp-db-33183.j77.aws-us-east-1.cockroachlabs.cloud:26257/svapp-db?sslmode=verify-full&sslrootcert=system"
+   ```
+   ```powershell
+   # Windows (PowerShell)
+   $env:DATABASE_URL="postgresql://admin-svapp:PASSWORD@svapp-db-33183.j77.aws-us-east-1.cockroachlabs.cloud:26257/svapp-db?sslmode=verify-full&sslrootcert=system"
    ```
    Replace `PASSWORD` with your actual credentials. `sslrootcert=system` uses your OS's trusted certificate store, so there's no need to download or reference a separate CA cert file.
-   > 🔐 Never commit your `.env` file — make sure it's listed in `.gitignore`.
+   > 🔐 Never commit real credentials — if you keep them in a local `.env` file for reference, make sure it's listed in `.gitignore`. On deployment platforms like Render, set `DATABASE_URL` as an environment variable in the service settings instead.
 
 3. **Launch the application:**
    Run the main script using Python:
