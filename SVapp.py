@@ -83,6 +83,10 @@ def get_scalar_docs():
                 title="Scalar API",
         )
 
+@app.get("/")
+def read_root():
+    return {"status": "ok"}
+
 #получение данных по тикеру по ID
 #@app.get("/ticker/{id}", response_model=schemas.ticker_info)
 #def get_ticker(id: int):
