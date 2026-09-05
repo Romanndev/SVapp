@@ -6,13 +6,13 @@ from typing import Any
 
 import psycopg2
 
+import schemas
 import stocks_valuation as sv
-from schemas import Ticker
 
 
 @contextmanager
 def get_db_connection():
-        conn = psycopg2.connect(os.environ["DATABASE_URL"],sslmode="require")
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
         #conn = sqlite3.connect('tickers.db')
         cur = conn.cursor()
         create_table(cur)
@@ -44,30 +44,44 @@ def create_table(cur):
 
 # удаление таблицы
 def drop_table(cur):
-    cur.execute('''DROP TABLE IF EXISTS tickers''')
+    cur.execute('''DROP TABLE IF EXISTS tickers CASCADE''')
 
-#чтение по Name
-def read_by_ticker(cur,ticker:str)->dict[str,Any]:
+    #cur.execute('''DROP TABLE IF EXISTS tickers''')
+
+# интересные тикеры для покупки
+def ineteresting_tickers(cur)->list[dict[str,Any]]:
+    result = []
+    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',('interesting',))
+    rows = cur.fetchall()
+    
+    for row in rows:
+        result.append({
+                    'id': row[0],
+                    'ticker': row[1],
+                    'fullname': row[2],
+                    'price': row[3],
+                    'currency': row[4],
+                    'truePrice': row[5],
+                    'status': row[6]
+                    
+                    })
+    
+    return  result
+
+# информация по тикеру
+def ticker_info(cur,ticker:str)->dict[str,Any]:
 # доработать проверку на отсутствие тикера в БД  
     #ticker = sv.check_ticker_name(ticker)  
-    cur.execute('''SELECT * FROM Tickers WHERE ticker=%s''',(ticker,))
-    
+    cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     row =cur.fetchone()
     if row is None:
         return {
-                'id': None,
-                'ticker': None,
-                'fullname': None,
-                'price': None,
-                'currency': None,
-                'truePrice': None, 
-                'status': None
+                'status':'no ticker in the database'
                 }
-    # cur.execute("SELECT COUNT(*) FROM Tickers;")
-    # count = cur.fetchone()[0]
-    # print(count)
-    else :
-        return {
+    cur.execute("SELECT COUNT(*) FROM tsx_stocks")
+    count = cur.fetchone()[0]
+    print(count)
+    return {
                 'id': row[0],
                 'ticker': row[1],
                 'fullname': row[2],
@@ -77,19 +91,19 @@ def read_by_ticker(cur,ticker:str)->dict[str,Any]:
                 'status': row[6]
                 }
 
-# добавление новой записи
-def add_record(cur, conn, ticker: Ticker)->dict[str, Any]:
-    ticker_lable = ticker.ticker
-    fullname = ticker.fullname
-    price = ticker.price
-    currency = ticker.currency
-    trueprice = ticker.truePrice
-    status = ticker.status
+# добавление нового тикера в БД
+def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
+    ticker = newticker_date.ticker
+    fullname = newticker_date.fullname
+    price = newticker_date.price
+    currency = newticker_date.currency
+    trueprice = newticker_date.truePrice
+    status = newticker_date.status.value
 
-    cur.execute('''INSERT INTO Tickers(ticker, fullname, price, currency, truePrice, status) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING''', (ticker_lable, fullname, price, currency, trueprice, status))
-    cur.execute('''SELECT * FROM Tickers WHERE ticker=%s''',(ticker_lable,))
+    cur.execute('''INSERT INTO tsx_stocks(ticker, fullname, price, currency, truePrice, status) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING''', (ticker, fullname, price, currency, trueprice, status))
+    cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     row = cur.fetchone() 
-    conn.commit()
+    print(row[7])
     return {
                 'id': row[0],
                 'ticker': row[1],
@@ -117,28 +131,10 @@ def edit_record(cur, ticker, status)->dict[str, Any]:
 
 # удаление записи по ID
 def delete_record(cur,conn,ticker:str):
-    cur.execute('''DELETE FROM Tickers WHERE ticker=%s''',(ticker,))
+    cur.execute('''DELETE FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     conn.commit()
 
-#тикеры для покупки
-def tickers_for_buying(cur)->list[dict[str,Any]]:
-    cur.execute('''SELECT * FROM Tickers WHERE status=%s''',('YES',))
-    rows = cur.fetchall()
-
-    result = []
-
-    for row in rows:
-        result.append({
-                    'id': row[0],
-                    'ticker': row[1],
-                    'fullname': row[2],
-                    'price': row[3],
-                    'currency': row[4],
-                    'truePrice': row[5], 
-                    'status': row[6]
-                    })
-
-    return result    
+   
 
 #обновление данных по все тикерам в БД
 async def update_all(cur):
@@ -160,18 +156,31 @@ async def update_all(cur):
         elif param[1]> param[5]:
                     cur.execute('''UPDATE Tickers SET price=%s,truePrice=%s,status=%s WHERE ticker=%s''',(param[1],param[5],'NO',ticker))  
 
+def record_data(cur, all_companies:dict):
+    
+    for name,param in all_companies.items() :
+     
+            if param[5] == 0 or param[1] > param[5] : # [longName,currentPrice,currency, eps, bvps, gvalue]
+                status = 'not interesting'
+            else:
+                status = 'interesting'
+        
+            cur.execute('INSERT INTO tsx_stocks(ticker,fullname,price,currency,truePrice,status) ' \
+            'VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING',
+            (name,param[0],param[1],param[2],param[5],status))
+        # [longName,currentPrice,currency, eps, bvps, gvalue]
 
         
-# чтение по ID
-def read_by_id(cur, id)->dict[str, Any]:
-    cur.execute('''SELECT * FROM Tickers WHERE id=%s''',(id,))
-    row = cur.fetchone()
-    return {
-            'id': row[0],
-            'ticker': row[1],
-            'fullname': row[2],
-            'price': row[3],
-            'currency': row[4],
-            'truePrice': row[5], 
-            'status': row[6]
-            }  
+# # чтение по ID
+# def read_by_id(cur, id)->dict[str, Any]:
+#     cur.execute('''SELECT * FROM Tickers WHERE id=%s''',(id,))
+#     row = cur.fetchone()
+#     return {
+#             'id': row[0],
+#             'ticker': row[1],
+#             'fullname': row[2],
+#             'price': row[3],
+#             'currency': row[4],
+#             'truePrice': row[5], 
+#             'status': row[6]
+#             }  
