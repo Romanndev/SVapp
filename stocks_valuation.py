@@ -169,20 +169,23 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
 #    print(f"total work time {time_finish-time_start} seconds")
 
     return all_companies
+    
+    
+def check_ticker_name(ticker):
+     ticker = ticker.upper()
 
-# def record_data(cur, all_companies:dict):
-    
-#     for name,param in all_companies.items() :
+     if ticker.startswith('-') : ticker = ticker.removeprefix('-')
+     if ticker.startswith('.') : ticker = ticker.removeprefix('.')
+     #if ticker.startswith('/') : ticker = ticker.removeprefix('/')
      
-#             if param[5] == 0 or param[1] > param[5] : # [longName,currentPrice,currency, eps, bvps, gvalue]
-#                 status = 'not interesting'
-#             else:
-#                 status = 'interesting'
-        
-#             cur.execute('INSERT INTO Tickers(ticker,fullname,price,currency,truePrice,status) ' \
-#             'VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING',
-#             (name,param[0],param[1],param[2],param[5],status))
-     
+     if ticker.find('/') != -1: ticker = ticker.replace('/','-')
     
-# def check_ticker_name(ticker):
-#     ticker          
+     if ticker.endswith('-'): ticker = ticker[:-1].replace('-','.TO')
+     if ticker.endswith('.'): ticker = ticker[:-1].replace('.','.TO')
+     if ticker.endswith('/'): ticker = ticker[:-1].replace('.','.TO')
+     
+     if ticker.find('.TO') == -1: ticker = ticker + '.TO'
+     
+     print(ticker)
+
+     return ticker          

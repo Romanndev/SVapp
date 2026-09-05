@@ -10,29 +10,19 @@ import stocks_valuation as sv
 
 app = FastAPI()
 
-# @app.get("/ticker/droptable")
-# def droptable():
-#      with db.get_db_connection() as conn,conn.cursor() as cur:
-#             db.drop_table(cur)
-#      return {"status": "table dropped"}
-
-# загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
-# @app.post("/ticker/upload_tickers") 
-# async def upload_tickers(): 
-#     with db.get_db_connection() as conn, conn.cursor() as cur: 
-#             file_name = 'list_of_tickers.txt' 
-#             list_of_tickers = sv.upload_tickers_from_file(file_name) 
-#             companies = await sv.companies_data(list_of_tickers) 
-#             db.record_data(cur, companies) 
-        
-#     return {'status': 'data is loaded'}
-
 #список тикеров для покупки
 @app.get("/ticker/interesting_tickers", response_model=list[schemas.ticker_info])
 def interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        cur = conn.cursor()
         row = db.ineteresting_tickers(cur)
+
+        return row
+
+#список неинтересных тикеров для покупки
+@app.get("/ticker/not_interesting_tickers", response_model=list[schemas.ticker_info])
+def not_interesting_tickers():
+    with db.get_db_connection() as conn, conn.cursor() as cur:
+        row = db.not_ineteresting_tickers(cur)
 
         return row
 
@@ -40,7 +30,6 @@ def interesting_tickers():
 @app.get("/ticker/ticker_info/{ticker}", response_model=schemas.ticker_info| dict[str,Any])   
 def ticker_info(ticker:str):
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        #ticker = ticker.upper()
         row = db.ticker_info(cur, ticker)
         return row
 
@@ -52,16 +41,6 @@ def adding_ticker(ticker:str):
             date_for_DB = sv.newticker_date(ticker)    
             row = db.save_new_ticker(cur, date_for_DB)
         return row
-
-  
-#обновление статуса по тикерам, на усмотрение пользователя
-# @app.patch("/ticker/update_status/{ticker}")
-# def update_status(ticker:str,status:str):
-#     with db.get_db_connection() as conn:
-#         cur = conn.cursor()
-#         row = db.edit_record(cur,ticker,status)
-#         cur.close()
-#         return row    
 
 #удаление тикеров из БД
 @app.delete("/ticker/delete_ticker/{ticker}")

@@ -68,19 +68,36 @@ def ineteresting_tickers(cur)->list[dict[str,Any]]:
     
     return  result
 
+# неинтересные тикеры для покупки
+def not_ineteresting_tickers(cur)->list[dict[str,Any]]:
+    result = []
+    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',('not interesting',))
+    rows = cur.fetchall()
+    
+    for row in rows:
+        result.append({
+                    'id': row[0],
+                    'ticker': row[1],
+                    'fullname': row[2],
+                    'price': row[3],
+                    'currency': row[4],
+                    'truePrice': row[5],
+                    'status': row[6]
+                    
+                    })
+    
+    return  result
+
 # информация по тикеру
-def ticker_info(cur,ticker:str)->dict[str,Any]:
-# доработать проверку на отсутствие тикера в БД  
-    #ticker = sv.check_ticker_name(ticker)  
+def ticker_info(cur,ticker:str)->dict[str,Any]: 
+    ticker = sv.check_ticker_name(ticker)  
     cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     row =cur.fetchone()
     if row is None:
         return {
                 'status':'no ticker in the database'
                 }
-    cur.execute("SELECT COUNT(*) FROM tsx_stocks")
-    count = cur.fetchone()[0]
-    print(count)
+    
     return {
                 'id': row[0],
                 'ticker': row[1],
@@ -103,7 +120,7 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
     cur.execute('''INSERT INTO tsx_stocks(ticker, fullname, price, currency, truePrice, status) VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING''', (ticker, fullname, price, currency, trueprice, status))
     cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     row = cur.fetchone() 
-    print(row[7])
+    
     return {
                 'id': row[0],
                 'ticker': row[1],
@@ -114,7 +131,7 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
                 'status': row[6]
                 }
 
-# редактирование записи, иземенение статусапо тикеру
+# редактирование записи, иземенение статуса по тикеру
 def edit_record(cur, ticker, status)->dict[str, Any]:
     cur.execute('''UPDATE Tickers SET status=%s WHERE ticker=%s''',(status,ticker))
     cur.execute('''SELECT * FROM Tickers WHERE ticker=%s''', (ticker,))
@@ -129,14 +146,12 @@ def edit_record(cur, ticker, status)->dict[str, Any]:
                 'status': row[6]
                 }
 
-# удаление записи по ID
+# удаление записи
 def delete_record(cur,conn,ticker:str):
     cur.execute('''DELETE FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     conn.commit()
-
-   
-
-#обновление данных по все тикерам в БД
+ 
+#обновление данных по всем тикерам в БД
 async def update_all(cur):
     tickers_lable = []
     company_data = {}
@@ -171,16 +186,3 @@ def record_data(cur, all_companies:dict):
         # [longName,currentPrice,currency, eps, bvps, gvalue]
 
         
-# # чтение по ID
-# def read_by_id(cur, id)->dict[str, Any]:
-#     cur.execute('''SELECT * FROM Tickers WHERE id=%s''',(id,))
-#     row = cur.fetchone()
-#     return {
-#             'id': row[0],
-#             'ticker': row[1],
-#             'fullname': row[2],
-#             'price': row[3],
-#             'currency': row[4],
-#             'truePrice': row[5], 
-#             'status': row[6]
-#             }  
