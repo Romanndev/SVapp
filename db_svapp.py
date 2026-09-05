@@ -12,7 +12,7 @@ from schemas import Ticker
 
 @contextmanager
 def get_db_connection():
-        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        conn = psycopg2.connect(os.environ["DATABASE_URL"],sslmode="require")
         #conn = sqlite3.connect('tickers.db')
         cur = conn.cursor()
         create_table(cur)
@@ -26,19 +26,25 @@ def get_db_connection():
 # создание таблицы
 def create_table(cur):
     try :
-        cur.execute('''CREATE TABLE IF NOT EXISTS Tickers (
-                id SERIAL PRIMARY KEY,
-                ticker TEXT UNIQUE,
-                fullname TEXT,
-                price REAL,
-                currency TEXT,
-                truePrice REAL, 
-                status TEXT,
-                data DATE DEFAULT CURRENT_TIMESTAMP)
-                ''')
+        cur.execute("""CREATE TABLE IF NOT EXISTS tsx_stocks (
+                id INT8 NOT NULL DEFAULT unique_rowid(),
+                ticker STRING UNIQUE,
+                fullname STRING,
+                price FLOAT4,
+                currency STRING,
+                truePrice FLOAT4,
+                status STRING,
+                data DATE DEFAULT current_timestamp():::DATE,
+                CONSTRAINT tsx_stocks_pkey PRIMARY KEY (id ASC)
+                )"""
+                    )
            
     except psycopg2.Error as e:
         raise psycopg2.OperationalError(f"Error, table creation: '{e}'")
+
+# удаление таблицы
+def drop_table(cur):
+    cur.execute('''DROP TABLE IF EXISTS tickers''')
 
 #чтение по Name
 def read_by_ticker(cur,ticker:str)->dict[str,Any]:

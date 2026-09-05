@@ -8,6 +8,14 @@ import stocks_valuation as sv
 
 app = FastAPI()
 
+@app.get("/ticker/droptable")
+def droptable():
+     with db.get_db_connection() as conn:
+          cur = conn.cursor()
+          db.drop_table(cur)
+          cur.close()
+          
+          return {"status": "table dropped"}
 
 #список тикеров для покупки
 @app.get("/ticker/tickers_for_buying", response_model=list[schemas.ticker_info])
