@@ -34,10 +34,10 @@ def ticker_info(ticker:str):
         return row
 
 #добавление нового тикера
-@app.post("/ticker/adding_ticker/{ticker}", response_model=schemas.ticker_info)
-def adding_ticker(ticker:str):
+@app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info)
+def add_ticker(ticker:str):
         with db.get_db_connection() as conn, conn.cursor() as cur:
-# def обработка тикера, сделать большими бувками и добаить .TO
+            ticker = sv.check_ticker_name(ticker)
             date_for_DB = sv.newticker_date(ticker)    
             row = db.save_new_ticker(cur, date_for_DB)
         return row
