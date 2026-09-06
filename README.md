@@ -4,14 +4,17 @@
 
 > ⚠️ **Disclaimer:** The calculation results are for informational purposes only and do not constitute financial advice.
 
+🌐 **Live demo:** [svapp-r5d4.onrender.com/get_scalar_docs](https://svapp-r5d4.onrender.com/get_scalar_docs)
+
 ---
 
 ## 🚀 How It Works
 
 1. **Data Input:** Tickers are added individually via the API.
-2. **Data Parsing:** The app fetches financial metrics (EPS, BVPS, current price) from [Yahoo Finance](https://ca.finance.yahoo.com/) using `yfinance`, with a spoofed browser session to avoid rate limiting.
-3. **Calculation & Storage:** Fair value is calculated using Graham's formula, and results are stored in a **CockroachDB Serverless** database via `psycopg2`.
-4. **API Access:** All data — updating, reading, filtering undervalued stocks — is exposed through a FastAPI REST API with Pydantic-validated schemas.
+2. **Ticker Normalization:** Ticker symbols are automatically cleaned up (stray `-`, `.`, `/` characters) and the `.TO` (Toronto Stock Exchange) suffix is appended if missing.
+3. **Data Parsing:** The app fetches financial metrics (EPS, BVPS, current price) from [Yahoo Finance](https://ca.finance.yahoo.com/) using `yfinance`, with a spoofed browser session to avoid rate limiting.
+4. **Calculation & Storage:** Fair value is calculated using Graham's formula, and results are stored in a **CockroachDB Serverless** database via `psycopg2`.
+5. **API Access:** All data — adding, reading, filtering undervalued stocks — is exposed through a FastAPI REST API with Pydantic-validated schemas.
 
 ---
 
@@ -20,10 +23,10 @@
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/` | Health check / root endpoint |
-| `GET` | `/ticker/tickers_for_buying` | Returns tickers currently flagged as undervalued |
-| `GET` | `/ticker/ticker_info_by_name/{ticker}` | Returns ticker data by symbol |
-| `POST` | `/ticker/create_ticker_in_db/{ticker}` | Adds a new ticker record by symbol, fetches data, and saves to DB |
-| `PATCH` | `/ticker/update_status/{ticker}?status=...` | Updates the status of a ticker by symbol (`status` passed as a query parameter) |
+| `GET` | `/ticker/interesting_tickers` | Returns tickers currently flagged as undervalued (`interesting`) |
+| `GET` | `/ticker/not_interesting_tickers` | Returns tickers currently flagged as not undervalued (`not interesting`) |
+| `GET` | `/ticker/ticker_info/{ticker}` | Returns ticker data by symbol (ticker name is auto-normalized) |
+| `POST` | `/ticker/add_ticker/{ticker}` | Adds a new ticker, fetches live data, calculates fair value, and saves it to the DB |
 | `DELETE` | `/ticker/delete_ticker/{ticker}` | Removes a ticker record by symbol |
 | `GET` | `/get_scalar_docs` | Interactive API documentation (via Scalar) |
 
@@ -37,7 +40,7 @@
 - **Data Collection & Parsing:**
   * [`yfinance`](https://github.com/ranaroussi/yfinance) — fetches EPS, BVPS, and current price from Yahoo Finance
   * [`requests`](https://requests.readthedocs.io/) — custom session with spoofed headers to handle anti-bot restrictions
-  * `asyncio` (`TaskGroup` + `to_thread`) — fetches data for multiple tickers concurrently
+  * `asyncio` (`TaskGroup` + `to_thread`) — fetches data for multiple tickers concurrently (used for batch operations)
 - **Database Connectivity:**
   * [`psycopg2`](https://www.psycopg.org/) — connects to CockroachDB (PostgreSQL wire protocol)
 - **API Docs:** [Scalar](https://github.com/scalar/scalar) — interactive API reference
