@@ -1,13 +1,16 @@
+import datetime
 import os
 
 #import sqlite3
 from contextlib import contextmanager
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import psycopg2
 
 import schemas
 import stocks_valuation as sv
+from schemas import ticker_status
 
 
 @contextmanager
@@ -34,7 +37,7 @@ def create_table(cur):
                 currency STRING,
                 truePrice FLOAT4,
                 status STRING,
-                data DATE DEFAULT current_timestamp():::DATE,
+                update_date DATE DEFAULT current_timestamp():::DATE,
                 CONSTRAINT tsx_stocks_pkey PRIMARY KEY (id ASC)
                 )"""
                     )
@@ -44,14 +47,12 @@ def create_table(cur):
 
 # удаление таблицы
 def drop_table(cur):
-    cur.execute('''DROP TABLE IF EXISTS tickers CASCADE''')
-
-    #cur.execute('''DROP TABLE IF EXISTS tickers''')
+    cur.execute('''DROP TABLE IF EXISTS tsx_stocks CASCADE''')
 
 # интересные тикеры для покупки
 def ineteresting_tickers(cur)->list[dict[str,Any]]:
     result = []
-    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',('interesting',))
+    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.interesting.value,))
     rows = cur.fetchall()
     
     for row in rows:
@@ -62,7 +63,8 @@ def ineteresting_tickers(cur)->list[dict[str,Any]]:
                     'price': row[3],
                     'currency': row[4],
                     'truePrice': row[5],
-                    'status': row[6]
+                    'status': row[6],
+                    'update_date': row[7]
                     
                     })
     
@@ -71,7 +73,7 @@ def ineteresting_tickers(cur)->list[dict[str,Any]]:
 # неинтересные тикеры для покупки
 def not_ineteresting_tickers(cur)->list[dict[str,Any]]:
     result = []
-    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',('not interesting',))
+    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.not_interesting.value,))
     rows = cur.fetchall()
     
     for row in rows:
@@ -82,7 +84,8 @@ def not_ineteresting_tickers(cur)->list[dict[str,Any]]:
                     'price': row[3],
                     'currency': row[4],
                     'truePrice': row[5],
-                    'status': row[6]
+                    'status': row[6],
+                    'update_date': row[7]
                     
                     })
     
@@ -93,6 +96,7 @@ def ticker_info(cur,ticker:str)->dict[str,Any]:
     ticker = sv.check_ticker_name(ticker)  
     cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     row =cur.fetchone()
+        
     if row is None:
         return {
                 'status':'no ticker in the database'
@@ -105,7 +109,8 @@ def ticker_info(cur,ticker:str)->dict[str,Any]:
                 'price': row[3],
                 'currency': row[4],
                 'truePrice': row[5], 
-                'status': row[6]
+                'status': row[6],
+                'update_date': row[7]
                 }
 
 # добавление нового тикера в БД
@@ -133,8 +138,8 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
 
 # редактирование записи, иземенение статуса по тикеру
 def edit_record(cur, ticker, status)->dict[str, Any]:
-    cur.execute('''UPDATE Tickers SET status=%s WHERE ticker=%s''',(status,ticker))
-    cur.execute('''SELECT * FROM Tickers WHERE ticker=%s''', (ticker,))
+    cur.execute('''UPDATE tsx_stocks SET status=%s WHERE ticker=%s''',(status,ticker))
+    cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''', (ticker,))
     row = cur.fetchone()
     return {
                 'id': row[0],
@@ -153,32 +158,44 @@ def delete_record(cur,conn,ticker:str):
  
 #обновление данных по всем тикерам в БД
 async def update_all(cur):
-    tickers_lable = []
+    tickerslist = []
     company_data = {}
-    
-    cur.execute('''SELECT ticker FROM Tickers''')
-    for i in cur.fetchall():
-      tickers_lable.append(i[0])
+    current_date = datetime.datetime.now(ZoneInfo("America/Edmonton")).date()
+    tickerslist = tickersupdate(cur,current_date)
+    if not tickerslist: 
+        print(' нет строк для обновления') 
+        return {'status':'Tickers are updated'}
 
-    company_data = await sv.companies_data(tickers_lable)
+    company_data = await sv.companies_data(tickerslist)
     for ticker, param in company_data.items():  
-        if  param[5] is None or param[1] is None:
-            cur.execute('''UPDATE Tickers SET price=%s,truePrice=%s,status=%s WHERE ticker=%s''',(param[1],param[5],'NO',ticker))
+         if  param[5] == 0 or param[1] > param[5]:
+            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.not_interesting.value,current_date,ticker))
 
-        elif param[1]< param[5]:
-            cur.execute('''UPDATE Tickers SET price=%s,truePrice=%s,status=%s WHERE ticker=%s''',(param[1],param[5],'YES',ticker))
+         elif param[1]< param[5]:
+            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.interesting.value,current_date,ticker))
 
-        elif param[1]> param[5]:
-                    cur.execute('''UPDATE Tickers SET price=%s,truePrice=%s,status=%s WHERE ticker=%s''',(param[1],param[5],'NO',ticker))  
+    return {'status':'Tickers are updated'}
+
+def tickersupdate(cur,current_date)->list[str]:
+    count = 0
+    tickerslist : list[str] = []
+    cur.execute('''SELECT ticker FROM tsx_stocks WHERE update_date < %s''',(current_date,))
+    if cur.fetchall() is None or len(cur.fetchall()) == 0: return tickerslist # empty list if no tickers to update
+    for i in cur.fetchall():
+        tickerslist.append(i)
+        if count == 10 :  break
+        else:  count = count + 1
+
+    return tickerslist
 
 def record_data(cur, all_companies:dict):
     
     for name,param in all_companies.items() :
      
             if param[5] == 0 or param[1] > param[5] : # [longName,currentPrice,currency, eps, bvps, gvalue]
-                status = 'not interesting'
+                status = ticker_status.not_interesting.value
             else:
-                status = 'interesting'
+                status = ticker_status.interesting.value
         
             cur.execute('INSERT INTO tsx_stocks(ticker,fullname,price,currency,truePrice,status) ' \
             'VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING',

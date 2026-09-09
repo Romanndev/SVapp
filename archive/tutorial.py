@@ -1,3 +1,5 @@
+# total_records = cur.fetchone()[0]
+# print(f"Количество записей: {total_records}")
 #--------------------------------------------------------------------------------
 # @app.get("/ticker/droptable")
 # def droptable():

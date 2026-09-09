@@ -133,10 +133,11 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
 
 # Создаем сессию requests и маскируемся под обычный браузер
 # Create a requests session and disguise it as a regular browser
+          
     session = requests.Session()
     session.headers.update({
-           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        })
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+         })
     
 # получаем параметры по тикерам в асинхноррном режиме
 # get ticker parameters in asynchronous mode
@@ -147,7 +148,7 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
         for i in list_of_tickers :
             task = tg.create_task(asyncio.to_thread(yfinance_parameters, i, session))
             task_list.append(task)
-            await asyncio.sleep(2)
+            await asyncio.sleep(0.3)
 
     companies_parameters_list = [task.result() for task in task_list]
 
@@ -169,8 +170,8 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
 #    print(f"total work time {time_finish-time_start} seconds")
 
     return all_companies
-    
-    
+  
+#-------------------------------------------------------------------------------------
 def check_ticker_name(ticker):
      ticker = ticker.upper()
 
@@ -185,7 +186,5 @@ def check_ticker_name(ticker):
      if ticker.endswith('/'): ticker = ticker[:-1].replace('.','.TO')
      
      if ticker.find('.TO') == -1: ticker = ticker + '.TO'
-     
-     print(ticker)
 
      return ticker          

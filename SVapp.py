@@ -11,7 +11,7 @@ import stocks_valuation as sv
 app = FastAPI()
 
 #список тикеров для покупки
-@app.get("/ticker/interesting_tickers", response_model=list[schemas.ticker_info])
+@app.get("/ticker/interesting_tickers", response_model=list[schemas.fulldate])
 def interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.ineteresting_tickers(cur)
@@ -19,7 +19,7 @@ def interesting_tickers():
         return row
 
 #список неинтересных тикеров для покупки
-@app.get("/ticker/not_interesting_tickers", response_model=list[schemas.ticker_info])
+@app.get("/ticker/not_interesting_tickers", response_model=list[schemas.fulldate])
 def not_interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.not_ineteresting_tickers(cur)
@@ -27,7 +27,7 @@ def not_interesting_tickers():
         return row
 
 # инфо по тикеру
-@app.get("/ticker/ticker_info/{ticker}", response_model=schemas.ticker_info| dict[str,Any])   
+@app.get("/ticker/ticker_info/{ticker}", response_model=schemas.fulldate | dict[str,Any])   
 def ticker_info(ticker:str):
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.ticker_info(cur, ticker)
@@ -51,6 +51,14 @@ def delete_ticker(ticker:str):
        db.delete_record(cur,conn,ticker)
        return  {'status': 'ticker deleted'}
 
+# обновление данных по всем тикерам в БД 
+@app.patch("/ticker/update_tickers", response_model=dict[str,str]) 
+async def update_tickers(): 
+     with db.get_db_connection() as conn, conn.cursor() as cur:
+        await db.update_all(cur)
+
+     return {'status':'Tickers are updated'}
+
 #docs
 @app.get("/get_scalar_docs")
 def get_scalar_docs():
@@ -63,6 +71,24 @@ def get_scalar_docs():
 def read_root():
     return {"status": "ok"}
 
+#--------------------------------------------------------------------------------
+@app.get("/ticker/droptable")
+def droptable():
+     with db.get_db_connection() as conn,conn.cursor() as cur:
+            db.drop_table(cur)
+     return {"status": "table dropped"}
+#--------------------------------------------------------------------------------
+# загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
+#--------------------------------------------------------------------------------
+@app.post("/ticker/upload_tickers") 
+async def upload_tickers(): 
+    with db.get_db_connection() as conn, conn.cursor() as cur: 
+            file_name = 'list_of_tickers.txt' 
+            list_of_tickers = sv.upload_tickers_from_file(file_name) 
+            companies = await sv.companies_data(list_of_tickers) 
+            db.record_data(cur, companies) 
+        
+    return {'status': 'data is loaded'}
         
 # ---------------------------------------------------------------------
 if __name__ == "__main__":

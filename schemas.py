@@ -18,7 +18,7 @@ class ticker_info(BaseModel):
     status : ticker_status
 
 class fulldate(ticker_info): 
-    date : date   
+    update_date : date   
 
 class newticker(BaseModel):
     ticker : str
