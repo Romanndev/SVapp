@@ -72,23 +72,23 @@ def read_root():
     return {"status": "ok"}
 
 #--------------------------------------------------------------------------------
-@app.get("/ticker/droptable")
-def droptable():
-     with db.get_db_connection() as conn,conn.cursor() as cur:
-            db.drop_table(cur)
-     return {"status": "table dropped"}
-#--------------------------------------------------------------------------------
-# загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
-#--------------------------------------------------------------------------------
-@app.post("/ticker/upload_tickers") 
-async def upload_tickers(): 
-    with db.get_db_connection() as conn, conn.cursor() as cur: 
-            file_name = 'list_of_tickers.txt' 
-            list_of_tickers = sv.upload_tickers_from_file(file_name) 
-            companies = await sv.companies_data(list_of_tickers) 
-            db.record_data(cur, companies) 
+# @app.get("/ticker/droptable")
+# def droptable():
+#      with db.get_db_connection() as conn,conn.cursor() as cur:
+#             db.drop_table(cur)
+#      return {"status": "table dropped"}
+# #--------------------------------------------------------------------------------
+# # загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
+# #--------------------------------------------------------------------------------
+# @app.post("/ticker/upload_tickers") 
+# async def upload_tickers(): 
+#     with db.get_db_connection() as conn, conn.cursor() as cur: 
+#             file_name = 'list_of_tickers.txt' 
+#             list_of_tickers = sv.upload_tickers_from_file(file_name) 
+#             companies = await sv.companies_data(list_of_tickers) 
+#             db.record_data(cur, companies) 
         
-    return {'status': 'data is loaded'}
+#     return {'status': 'data is loaded'}
         
 # ---------------------------------------------------------------------
 if __name__ == "__main__":
