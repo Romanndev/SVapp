@@ -163,7 +163,6 @@ async def update_all(cur):
     current_date = datetime.datetime.now(ZoneInfo("America/Edmonton")).date()
     tickerslist = tickersupdate(cur,current_date)
     if not tickerslist: 
-        print(' нет строк для обновления') 
         return {'status':'Tickers are updated'}
 
     company_data = await sv.companies_data(tickerslist)
@@ -174,7 +173,7 @@ async def update_all(cur):
          elif param[1]< param[5]:
             cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.interesting.value,current_date,ticker))
 
-    return {'status':'Tickers are updated'}
+    return {'status':'Tickers are updated...'}
 
 def tickersupdate(cur,current_date)->list[str]:
     count = 0
