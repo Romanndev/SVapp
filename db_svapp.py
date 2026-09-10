@@ -179,10 +179,9 @@ def tickersupdate(cur,current_date)->list[str]:
     count = 1
     tickerslist : list[str] = []
     cur.execute('''SELECT ticker FROM tsx_stocks WHERE update_date < %s''',(current_date,))
-    if cur.fetchmany(10) is None or len(cur.fetchmany(10)) == 0: 
+    tickerslist = cur.fetchmany(10)
+    if tickerslist is None or len(tickerslist) == 0: 
         return tickerslist # empty list if no tickers to update
-    else:
-        tickerlist = cur.fetchmany(10)
     return tickerslist
 
 def record_data(cur, all_companies:dict):
