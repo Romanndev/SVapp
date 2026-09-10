@@ -178,10 +178,10 @@ async def update_all(cur):
 def tickersupdate(cur,current_date)->list[str]:
     tickerslist = []
     cur.execute('''SELECT ticker FROM tsx_stocks WHERE update_date < %s''',(current_date,))
-    tickerslist = cur.fetchall()
+    tickerslist = cur.fetchone() #cur.fetchall()
     if tickerslist is None or len(tickerslist) == 0: 
         return [] # empty list if no tickers to update
-    return [row[0] for row in tickerslist[:10]]
+    return tickerslist #[row[0] for row in tickerslist[:10]]
 
 def record_data(cur, all_companies:dict):
     
