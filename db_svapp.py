@@ -176,17 +176,13 @@ async def update_all(cur):
     return {'status':'Tickers are updated...'}
 
 def tickersupdate(cur,current_date)->list[str]:
-    count = 0
+    count = 1
     tickerslist : list[str] = []
     cur.execute('''SELECT ticker FROM tsx_stocks WHERE update_date < %s''',(current_date,))
-    if cur.fetchall() is None or len(cur.fetchall()) == 0: 
+    if cur.fetchmany(10) is None or len(cur.fetchmany(10)) == 0: 
         return tickerslist # empty list if no tickers to update
     else:
-        for i in cur.fetchall():
-          tickerslist.append(i)
-          if count == 10 :  break
-          else:  count = count + 1
-
+        tickerlist = cur.fetchmany(10)
     return tickerslist
 
 def record_data(cur, all_companies:dict):
