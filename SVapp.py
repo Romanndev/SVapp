@@ -35,20 +35,20 @@ def ticker_info(ticker:str):
         return row
 
 #добавление нового тикера
-@app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info)
-def add_ticker(ticker:str):
-        with db.get_db_connection() as conn, conn.cursor() as cur:
-            ticker = db.check_ticker_name(ticker)
-            date_for_DB = sv.newticker_date(ticker)    
-            row = db.save_new_ticker(cur, date_for_DB)
-        return row
+# @app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info)
+# def add_ticker(ticker:str):
+#         with db.get_db_connection() as conn, conn.cursor() as cur:
+#             ticker = db.check_ticker_name(ticker)
+#             date_for_DB = sv.newticker_date(ticker)    
+#             row = db.save_new_ticker(cur, date_for_DB)
+#         return row
 
 #удаление тикера из БД
-@app.delete("/ticker/delete_ticker/{ticker}")
-def delete_ticker(ticker:str):
-    with db.get_db_connection() as conn,conn.cursor() as cur:
-        if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
-        if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
+# @app.delete("/ticker/delete_ticker/{ticker}")
+# def delete_ticker(ticker:str):
+#     with db.get_db_connection() as conn,conn.cursor() as cur:
+#         if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
+#         if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
 
 # обновление данных по всем тикерам в БД 
 # @app.patch("/ticker/update_tickers", response_model=dict[str,str]) 
