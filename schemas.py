@@ -7,23 +7,27 @@ from pydantic import BaseModel
 class ticker_status(Enum):
     interesting = 'interesting'
     not_interesting = 'not interesting'
-    
-class ticker_info(BaseModel):
+
+
+class ticker(BaseModel):
+    ticker : str
+    fullname : str
+    price : float
+    currency : str
+    truePrice : float
+    status : ticker_status
+
+class ticker_info(ticker):
     id : int
-    ticker : str
-    fullname : str
-    price : float
-    currency : str
-    truePrice : float
-    status : ticker_status
+    # ticker : str
+    # fullname : str
+    # price : float
+    # currency : str
+    # truePrice : float
+    # status : ticker_status
+    update_date : date
+      
 
-class fulldate(ticker_info): 
-    update_date : date   
-
-class newticker(BaseModel):
-    ticker : str
-    fullname : str
-    price : float
-    currency : str
-    truePrice : float
-    status : ticker_status
+class newticker(ticker):
+    eps : float
+    bvps : float

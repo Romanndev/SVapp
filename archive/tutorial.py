@@ -1,5 +1,6 @@
-# total_records = cur.fetchone()[0]
-# print(f"Количество записей: {total_records}")
+# cur.execute("SELECT COUNT(*) FROM your_table_name;")
+#total_records = cur.fetchone()[0]
+#print(f"Количество записей: {total_records}")
 #--------------------------------------------------------------------------------
 # @app.get("/ticker/droptable")
 # def droptable():

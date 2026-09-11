@@ -10,16 +10,16 @@ import stocks_valuation as sv
 
 app = FastAPI()
 
-#список тикеров для покупки
-@app.get("/ticker/interesting_tickers", response_model=list[schemas.fulldate])
+#список интересных тикеров для покупки
+@app.get("/ticker/interesting_tickers", response_model=list[schemas.ticker_info])
 def interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.ineteresting_tickers(cur)
 
         return row
 
-#список неинтересных тикеров для покупки
-@app.get("/ticker/not_interesting_tickers", response_model=list[schemas.fulldate])
+#список не интересных тикеров для покупки
+@app.get("/ticker/not_interesting_tickers", response_model=list[schemas.ticker_info])
 def not_interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.not_ineteresting_tickers(cur)
@@ -27,37 +27,36 @@ def not_interesting_tickers():
         return row
 
 # инфо по тикеру
-@app.get("/ticker/ticker_info/{ticker}", response_model=schemas.fulldate | dict[str,Any])   
+@app.get("/ticker/ticker_info/{ticker}", response_model=schemas.ticker_info | dict[str,Any])   
 def ticker_info(ticker:str):
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.ticker_info(cur, ticker)
+        if row == None: return {'status':'no ticker in the database'}
         return row
 
 #добавление нового тикера
 @app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info)
 def add_ticker(ticker:str):
         with db.get_db_connection() as conn, conn.cursor() as cur:
-            ticker = sv.check_ticker_name(ticker)
+            ticker = db.check_ticker_name(ticker)
             date_for_DB = sv.newticker_date(ticker)    
             row = db.save_new_ticker(cur, date_for_DB)
         return row
 
-#удаление тикеров из БД
+#удаление тикера из БД
 @app.delete("/ticker/delete_ticker/{ticker}")
 def delete_ticker(ticker:str):
     with db.get_db_connection() as conn,conn.cursor() as cur:
-       if not db.ticker_info(cur, ticker):
-            return {'status':'ticker not found'}
-       db.delete_record(cur,conn,ticker)
-       return  {'status': 'ticker deleted'}
+        if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
+        if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
 
 # обновление данных по всем тикерам в БД 
-@app.patch("/ticker/update_tickers", response_model=dict[str,str]) 
-async def update_tickers(): 
-     with db.get_db_connection() as conn, conn.cursor() as cur:
-        await db.update_all(cur)
+# @app.patch("/ticker/update_tickers", response_model=dict[str,str]) 
+# async def update_tickers(): 
+#      with db.get_db_connection() as conn, conn.cursor() as cur:
+#         await db.update_all(cur)
 
-     return {'status':'Tickers are updated'}
+#      return {'status':'tickers are updated'}
 
 #docs
 @app.get("/get_scalar_docs")

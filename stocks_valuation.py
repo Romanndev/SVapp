@@ -1,6 +1,6 @@
 import asyncio
 import math
-from typing import Any
+import random
 
 import requests
 import yfinance as yf
@@ -86,6 +86,8 @@ def newticker_date(ticker:str)->schemas.newticker:
             fullname=company_parameters[0],
             price=company_parameters[1],
             currency=company_parameters[2],
+            eps = company_parameters[3],
+            bvps = company_parameters[4],
             truePrice=company_parameters[5],
             status=(schemas.ticker_status.interesting) if company_parameters[1] <= gvalue else (schemas.ticker_status.not_interesting)
         )
@@ -96,6 +98,8 @@ def newticker_date(ticker:str)->schemas.newticker:
             fullname='no date',
             price=0.0,
             currency='no date',
+            eps = 0.0,
+            bvps = 0.0,
             truePrice=0.0,
             status= schemas.ticker_status.not_interesting
         )
@@ -148,13 +152,14 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
         for i in list_of_tickers :
             task = tg.create_task(asyncio.to_thread(yfinance_parameters, i, session))
             task_list.append(task)
-            await asyncio.sleep(10)
+            seconds = random.randint(1, 10)
+            await asyncio.sleep(seconds)
 
-    companies_parameters_list = [task.result() for task in task_list]
+    companies_parameters = [task.result() for task in task_list]
 
 # рассчет справедливой стоимость по тикеру 
 # calculation of fair value by ticker   
-    for i,y in zip(list_of_tickers, companies_parameters_list):
+    for i,y in zip(list_of_tickers, companies_parameters):
         CompanyData = y 
             
         if CompanyData is not None :
@@ -171,20 +176,4 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
 
     return all_companies
   
-#-------------------------------------------------------------------------------------
-def check_ticker_name(ticker):
-     ticker = ticker.upper()
-
-     if ticker.startswith('-') : ticker = ticker.removeprefix('-')
-     if ticker.startswith('.') : ticker = ticker.removeprefix('.')
-     #if ticker.startswith('/') : ticker = ticker.removeprefix('/')
-     
-     if ticker.find('/') != -1: ticker = ticker.replace('/','-')
-    
-     if ticker.endswith('-'): ticker = ticker[:-1].replace('-','.TO')
-     if ticker.endswith('.'): ticker = ticker[:-1].replace('.','.TO')
-     if ticker.endswith('/'): ticker = ticker[:-1].replace('.','.TO')
-     
-     if ticker.find('.TO') == -1: ticker = ticker + '.TO'
-
-     return ticker          
+       
