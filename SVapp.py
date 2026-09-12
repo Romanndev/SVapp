@@ -35,7 +35,7 @@ def ticker_info(ticker:str):
         return row
 
 # добавление нового тикера
-@app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info)
+@app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info | dict[str,str])
 def add_ticker(ticker:str):
         ticker = db.check_ticker_name(ticker)
         date_for_DB = sv.newticker_date(ticker) 
