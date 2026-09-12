@@ -62,11 +62,11 @@ def delete_ticker(ticker:str):
 #      return {'status':'tickers are updated'}
 
 # тест гипотизы - данные из yfinance альтернативный путь
-@app.get("/ticker/test_update")
-def test_update():
-    with db.get_db_connection() as conn, conn.cursor() as cur:
-        sv.test_update(cur)
-    return {'price':'all good'}
+# @app.get("/ticker/test_update")
+# def test_update():
+#     with db.get_db_connection() as conn, conn.cursor() as cur:
+#         sv.test_update(cur)
+#     return {'price':'all good'}
          
 #docs
 @app.get("/get_scalar_docs")
@@ -81,18 +81,18 @@ def read_root():
     return {"status": "ok"}
 
 #--------------------------------------------------------------------------------
-@app.get("/ticker/droptable")
-def droptable():
-     with db.get_db_connection() as conn,conn.cursor() as cur:
-            db.drop_table(cur)
-     return {"status": "table dropped"}
+# @app.get("/ticker/droptable")
+# def droptable():
+#      with db.get_db_connection() as conn,conn.cursor() as cur:
+#             db.drop_table(cur)
+#      return {"status": "table dropped"}
 # #--------------------------------------------------------------------------------
 # # загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
 # #--------------------------------------------------------------------------------
-@app.get("/ticker/upload_tickers")
-def create_table():
-     with db.get_db_connection() as con:
-          print('УРААА')
+# @app.get("/ticker/upload_tickers")
+# def create_table():
+#      with db.get_db_connection() as con:
+#           print('УРААА')
       
 # async def upload_tickers(): 
 #     with db.get_db_connection() as conn, conn.cursor() as cur: 
