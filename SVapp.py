@@ -39,10 +39,11 @@ def ticker_info(ticker:str):
 def add_ticker(ticker:str):
         with db.get_db_connection() as conn, conn.cursor() as cur:
             ticker = db.check_ticker_name(ticker)
-            date_for_DB = sv.newticker_date(ticker)    
+            date_for_DB = sv.newticker_date(ticker) 
+            if date_for_DB.fullname == 'no date': return {'status':'No information for this ticker. Check the name of the ticker'}   
             row = db.save_new_ticker(cur, date_for_DB)
         return row
-
+ 
 # удаление тикера из БД
 @app.delete("/ticker/delete_ticker/{ticker}")
 def delete_ticker(ticker:str):
@@ -58,6 +59,13 @@ def delete_ticker(ticker:str):
 
 #      return {'status':'tickers are updated'}
 
+# тест гипотизы - данные из yfinance альтернативный путь
+@app.get("/ticker/test_update")
+def test_update():
+    with db.get_db_connection() as conn, conn.cursor() as cur:
+        sv.test_update(cur)
+    return {'price':'all good'}
+         
 #docs
 @app.get("/get_scalar_docs")
 def get_scalar_docs():
@@ -71,15 +79,19 @@ def read_root():
     return {"status": "ok"}
 
 #--------------------------------------------------------------------------------
-# @app.get("/ticker/droptable")
-# def droptable():
-#      with db.get_db_connection() as conn,conn.cursor() as cur:
-#             db.drop_table(cur)
-#      return {"status": "table dropped"}
+@app.get("/ticker/droptable")
+def droptable():
+     with db.get_db_connection() as conn,conn.cursor() as cur:
+            db.drop_table(cur)
+     return {"status": "table dropped"}
 # #--------------------------------------------------------------------------------
 # # загрузка списка тикеров из файла, сбор данных по тикеру и запись в БД
 # #--------------------------------------------------------------------------------
-# @app.post("/ticker/upload_tickers") 
+@app.get("/ticker/upload_tickers")
+def create_table():
+     with db.get_db_connection() as con:
+          print('УРААА')
+      
 # async def upload_tickers(): 
 #     with db.get_db_connection() as conn, conn.cursor() as cur: 
 #             file_name = 'list_of_tickers.txt' 

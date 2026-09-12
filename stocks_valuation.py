@@ -1,4 +1,5 @@
 import asyncio
+import time
 import math
 import random
 
@@ -102,7 +103,7 @@ def newticker_date(ticker:str)->schemas.newticker:
             currency=company_parameters[2],
             eps = company_parameters[3],
             bvps = company_parameters[4],
-            truePrice=company_parameters[5],
+            truePrice=gvalue,
             status=(schemas.ticker_status.interesting) if company_parameters[1] <= gvalue else (schemas.ticker_status.not_interesting)
         )
 
@@ -190,4 +191,20 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
 
     return all_companies
   
-       
+
+def test_update(cur):
+    #price = []
+    cur.execute('''SELECT ticker FROM tsx_stocks''')
+    LT = cur.fetchall()
+    for i in LT:
+      ticker =i[0]
+      stock = yf.Ticker(ticker)
+      hist = stock.history(period="1d")
+      if hist.empty or 'Close' not in hist.columns:
+                print(f"Пропущен невалидный тикер: {ticker}")
+                continue
+      priceP = stock.fast_info['lastPrice'] 
+      #price.append(round(priceP))
+      time.sleep(10)
+      print(ticker,'=', priceP)
+    
