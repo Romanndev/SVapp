@@ -5,7 +5,6 @@ import time
 
 import requests
 import yfinance as yf
-from yfinance.exceptions import YFRateLimitError
 
 import schemas
 
