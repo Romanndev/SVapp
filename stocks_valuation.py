@@ -27,7 +27,7 @@ def graham_value(eps,bvps)->float:
 # функция собирает параметры по ТИКЕРУ для расчета формулы Грэма (синхронная функция с синхронной библиотекой yfinance)
 # The function collects parameters by TICKER to calculate the Graham formula (synchronous function with the synchronous library yfinance)
 #-------------------------------------------------------------------------------------
-def yfinance_parameters (ticker, session)->list | None :
+def yfinance_parameters (ticker)->list | None :
 
     list_parameters = []
 
@@ -88,7 +88,7 @@ def newticker_date(ticker:str)->schemas.newticker:
     # 'Sec-Fetch-User': '?1'
     #                        })
 
-    company_parameters = yfinance_parameters(ticker) #session
+    company_parameters = yfinance_parameters(ticker) 
     if company_parameters is not None :
         eps = company_parameters[3]
         bvps = company_parameters[4]
