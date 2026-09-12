@@ -37,10 +37,12 @@ def ticker_info(ticker:str):
 # добавление нового тикера
 @app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info)
 def add_ticker(ticker:str):
+        ticker = db.check_ticker_name(ticker)
+        date_for_DB = sv.newticker_date(ticker) 
+        if date_for_DB.fullname == 'no date': 
+            return {'status':'No information for this ticker. Check the name of the ticker'}
+        
         with db.get_db_connection() as conn, conn.cursor() as cur:
-            ticker = db.check_ticker_name(ticker)
-            date_for_DB = sv.newticker_date(ticker) 
-            if date_for_DB.fullname == 'no date': return {'status':'No information for this ticker. Check the name of the ticker'}   
             row = db.save_new_ticker(cur, date_for_DB)
         return row
  
