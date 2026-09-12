@@ -1,7 +1,7 @@
 import asyncio
-import time
 import math
 import random
+import time
 
 import requests
 import yfinance as yf
@@ -33,9 +33,12 @@ def yfinance_parameters (ticker)->list | None :
     list_parameters = []
 
     stock = yf.Ticker(ticker) # session=session yfinance.exceptions.YFRateLimitError
-    hist = stock.history(period="1d")
-    if hist.empty or 'Close' not in hist.columns: return None
-             
+    try:
+        hist = stock.history(period="1d")
+        if hist.empty or 'Close' not in hist.columns: return None
+    except requests.exceptions.HTTPError as e: 
+        if e.response is not None and e.response.status_code == 404: return None #  HTTP Error 404         
+
     try:
         info = stock.info
     
