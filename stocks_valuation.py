@@ -32,7 +32,10 @@ def yfinance_parameters (ticker)->list | None :
 
     list_parameters = []
 
-    stock = yf.Ticker(ticker) # session=session
+    stock = yf.Ticker(ticker) # session=session yfinance.exceptions.YFRateLimitError
+    hist = stock.history(period="1d")
+    if hist.empty or 'Close' not in hist.columns: return None
+             
     try:
         info = stock.info
     
