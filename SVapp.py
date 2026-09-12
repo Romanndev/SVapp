@@ -40,7 +40,7 @@ def add_ticker(ticker:str):
         ticker = db.check_ticker_name(ticker)
         date_for_DB = sv.newticker_date(ticker) 
         if date_for_DB.fullname == 'no date': 
-            return {'status':'No information for this ticker. Check the name of the ticker'}
+            return {'status':'Ticker data not found'}
         
         with db.get_db_connection() as conn, conn.cursor() as cur:
             row = db.save_new_ticker(cur, date_for_DB)
