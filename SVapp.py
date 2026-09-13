@@ -11,7 +11,7 @@ import stocks_valuation as sv
 app = FastAPI()
 
 #список интересных тикеров для покупки
-@app.get("/ticker/interesting_tickers", response_model=list[schemas.ticker_info])
+@app.get("/tsx_stocks/interesting_tickers", response_model=list[schemas.ticker_info])
 def interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.ineteresting_tickers(cur)
@@ -19,7 +19,7 @@ def interesting_tickers():
         return row
 
 #список не интересных тикеров для покупки
-@app.get("/ticker/not_interesting_tickers", response_model=list[schemas.ticker_info])
+@app.get("/tsx_stocks/not_interesting_tickers", response_model=list[schemas.ticker_info])
 def not_interesting_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.not_ineteresting_tickers(cur)
@@ -27,7 +27,7 @@ def not_interesting_tickers():
         return row
 
 # инфо по тикеру
-@app.get("/ticker/ticker_info/{ticker}", response_model=schemas.ticker_info | dict[str,Any])   
+@app.get("/tsx_stocks/ticker_info/{ticker}", response_model=schemas.ticker_info | dict[str,Any])   
 def ticker_info(ticker:str):
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.ticker_info(cur, ticker)
