@@ -65,8 +65,8 @@ def ineteresting_tickers(cur)->list[dict[str,Any]]:
                     'currency': row[4],
                     'truePrice': row[7],
                     'status': row[8],
-                    'id': row[0],
-                    'update_date': row[9]
+                    #'id': row[0],
+                    #'update_date': row[9]
                     
                     })
     
@@ -86,8 +86,8 @@ def not_ineteresting_tickers(cur)->list[dict[str,Any]]:
                     'currency': row[4],
                     'truePrice': row[7],
                     'status': row[8],
-                    'id': row[0],
-                    'update_date': row[9]
+                    #'id': row[0],
+                    #'update_date': row[9]
                     
                     })
     
@@ -125,8 +125,8 @@ def ticker_info(cur,ticker:str)->dict[str,Any] | None:
                 'currency': row[4],
                 'truePrice': row[7], 
                 'status': row[8],
-                'id': row[0],
-                'update_date': row[9]
+                #'id': row[0],
+                #'update_date': row[9]
                 }
 
 # добавление нового тикера в БД
