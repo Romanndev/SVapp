@@ -19,7 +19,7 @@ def fair_value():
         return row
 
 #список не интересных тикеров для покупки
-@app.get("/tsx_stocks/novervalued", response_model=list[schemas.ticker])
+@app.get("/tsx_stocks/overvalued", response_model=list[schemas.ticker])
 def overvalued():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.not_ineteresting_tickers(cur)
