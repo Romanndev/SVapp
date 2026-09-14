@@ -52,9 +52,9 @@ def drop_table(cur):
     cur.execute('''DROP TABLE IF EXISTS tsx_stocks CASCADE''')
 
 # интересные тикеры для покупки
-def ineteresting_tickers(cur)->list[dict[str,Any]]:
+def fair_value_tickers(cur)->list[dict[str,Any]]:
     result = []
-    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.interesting.value,))
+    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.fair_value.value,))
     rows = cur.fetchall()
     
     for row in rows:
@@ -73,9 +73,9 @@ def ineteresting_tickers(cur)->list[dict[str,Any]]:
     return  result
 
 # не интересные тикеры для покупки
-def not_ineteresting_tickers(cur)->list[dict[str,Any]]:
+def overvalued_tickers(cur)->list[dict[str,Any]]:
     result = []
-    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.not_interesting.value,))
+    cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.overvalued.value,))
     rows = cur.fetchall()
     
     for row in rows:
@@ -215,3 +215,8 @@ def edit_record(cur, ticker, status)->dict[str, Any]:
                 'truePrice': row[5], 
                 'status': row[6]
                 }
+
+def updateSTATUS(cur):
+    #cur.execute('''SELECT status FROM tsx_stocks WHERE status=%s''', ('interesting',))
+    cur.execute('''UPDATE tsx_stocks SET status=%s WHERE status=%s''',('fair value',ticker_status.interesting.value))
+    cur.execute('''UPDATE tsx_stocks SET status=%s WHERE status=%s''',('overvalued',ticker_status.not_interesting.value))

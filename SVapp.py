@@ -14,7 +14,7 @@ app = FastAPI()
 @app.get("/tsx_stocks/fair_value", response_model=list[schemas.ticker])
 def fair_value():
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        row = db.ineteresting_tickers(cur)
+        row = db.fair_value_tickers(cur)
 
         return row
 
@@ -22,7 +22,7 @@ def fair_value():
 @app.get("/tsx_stocks/overvalued", response_model=list[schemas.ticker])
 def overvalued():
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        row = db.not_ineteresting_tickers(cur)
+        row = db.overvalued_tickers(cur)
 
         return row
 
@@ -55,10 +55,11 @@ def ticker_info(ticker:str):
 
 # обновление данных по всем тикерам в БД 
 # @app.patch("/ticker/update_tickers", response_model=dict[str,str]) 
-# async def update_tickers(): 
+# #async 
+# def update_tickers(): 
 #      with db.get_db_connection() as conn, conn.cursor() as cur:
-#         await db.update_all(cur)
-
+#         #await db.update_all(cur)
+#        db.updateSTATUS(cur)
 #      return {'status':'tickers are updated'}
 
 # тест гипотизы - данные из yfinance альтернативный путь

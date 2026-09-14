@@ -5,9 +5,9 @@ from pydantic import BaseModel
 
 
 class ticker_status(Enum):
-    interesting = 'interesting'
-    not_interesting = 'not interesting'
-
+    fair_value = 'fair value'
+    overvalued = 'overvalued'
+  
 
 class ticker(BaseModel):
     ticker : str
