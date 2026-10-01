@@ -8,8 +8,8 @@ from zoneinfo import ZoneInfo
 
 import psycopg2
 
+import engine_svapp as sv
 import schemas
-import stocks_valuation as sv
 from schemas import ticker_status
 
 
