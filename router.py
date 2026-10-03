@@ -1,14 +1,19 @@
+
+from fastapi import APIRouter
+
+router = APIRouter()
+
 # добавление нового тикера
-# @app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info | dict[str,str])
-# def add_ticker(ticker:str):
-#         ticker = db.check_ticker_name(ticker)
-#         date_for_DB = sv.newticker_date(ticker) 
-#         if date_for_DB.fullname == 'no date': 
-#             return {'status':'Ticker data not found'}
+@app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info | dict[str,str])
+def add_ticker(ticker:str):
+        ticker = db.check_ticker_name(ticker)
+        date_for_DB = sv.newticker_date(ticker) 
+        if date_for_DB.fullname == 'no date': 
+            return {'status':'Ticker data not found'}
         
-#         with db.get_db_connection() as conn, conn.cursor() as cur:
-#             row = db.save_new_ticker(cur, date_for_DB)
-#         return row
+        with db.get_db_connection() as conn, conn.cursor() as cur:
+            row = db.save_new_ticker(cur, date_for_DB)
+        return row
  
 # удаление тикера из БД
 # @app.delete("/ticker/delete_ticker/{ticker}")

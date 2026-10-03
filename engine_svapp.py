@@ -109,7 +109,7 @@ def newticker_date(ticker:str)->schemas.newticker:
             eps = company_parameters[3],
             bvps = company_parameters[4],
             truePrice=gvalue,
-            status=(schemas.ticker_status.interesting) if company_parameters[1] <= gvalue else (schemas.ticker_status.not_interesting)
+            status=(schemas.ticker_status.interesting.value) if company_parameters[1] <= gvalue else (schemas.ticker_status.not_interesting.value)
         )
 
     else:
@@ -170,7 +170,7 @@ async def companies_data(list_of_tickers)->dict[str,list[float | str]]:
     task_list = []
     async with asyncio.TaskGroup() as tg:
         for i in list_of_tickers :
-            task = tg.create_task(asyncio.to_thread(yfinance_parameters, i, session))
+            task = tg.create_task(asyncio.to_thread(yfinance_parameters, i))
             task_list.append(task)
             seconds = random.randint(1, 10)
             await asyncio.sleep(seconds)

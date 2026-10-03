@@ -201,6 +201,7 @@ def delete_record(cur,ticker:str):
     ticker = check_ticker_name(ticker)
     cur.execute('''DELETE FROM tsx_stocks WHERE ticker=%s''',(ticker,))
     return True        
+
 # редактирование записи, иземенение статуса по тикеру
 def edit_record(cur, ticker, status)->dict[str, Any]:
     cur.execute('''UPDATE tsx_stocks SET status=%s WHERE ticker=%s''',(status,ticker))

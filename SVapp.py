@@ -41,7 +41,6 @@ def get_scalar_docs():
                 title="Scalar API",
         )
 
-#
 @app.get("/")
 def read_root():
     return {"status": "ok"}
