@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 import psycopg2
 
-import engine_svapp as sv
+import engine_sv as sv
 import schemas
 from schemas import ticker_status
 
@@ -123,7 +123,7 @@ def ticker_info(cur,ticker:str)->dict[str,Any] | None:
                 'fullname': row[2],
                 'price': row[3],
                 'currency': row[4],
-                'truePrice': row[7], 
+                'truePrice': row[7],
                 'status': row[8],
                 #'id': row[0],
                 #'update_date': row[9]
@@ -156,23 +156,22 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
                 }
  
 #обновление данных по всем тикерам в БД
-async def update_all(cur):
+async def update_tsx_stocks(cur):
     tickerslist = []
     company_data = {}
     current_date = datetime.datetime.now(ZoneInfo("America/Edmonton")).date()
     tickerslist = tickersupdate(cur,current_date)
-    if not tickerslist: 
-        return {'status':'Tickers are updated'}
+    if not tickerslist: return []
 
     company_data = await sv.companies_data(tickerslist)
     for ticker, param in company_data.items():  
          if  param[5] == 0 or param[1] > param[5]:
-            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.not_interesting.value,current_date,ticker))
+            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.overvalued.value,current_date,ticker))
 
-         elif param[1]< param[5]:
-            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.interesting.value,current_date,ticker))
-
-    return {'status':'Tickers are updated...'}
+         elif param[1] < (param[5]+3):
+            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.fair_value.value,current_date,ticker))
+        
+    return []
 
 def tickersupdate(cur,current_date)->list[str]:
     tickerslist = []

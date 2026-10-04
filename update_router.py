@@ -1,20 +1,32 @@
 
 from fastapi import APIRouter
 
+import db_sv as db
+import engine_sv as sv
+import schemas
+
 router = APIRouter()
 
+@router.post("/")
+async def update_tsx_stocks():
+    with db.get_db_connection() as conn, conn.cursor() as cur:
+        await db.update_tsx_stocks(cur)
+        return {'status': 'Tickers are updated'}
+
 # добавление нового тикера
-@app.post("/ticker/add_ticker/{ticker}", response_model=schemas.ticker_info | dict[str,str])
-def add_ticker(ticker:str):
-        ticker = db.check_ticker_name(ticker)
-        date_for_DB = sv.newticker_date(ticker) 
-        if date_for_DB.fullname == 'no date': 
-            return {'status':'Ticker data not found'}
+# @router.post("/{ticker}")
+# def add_ticker(ticker:str):
+#     sv.test_api(ticker)
+        # ticker = db.check_ticker_name(ticker)
+        # date_for_DB = sv.newticker_date(ticker) 
+        # if date_for_DB.fullname == 'no date': 
+        #     return {'status':'Ticker data not found'}
         
-        with db.get_db_connection() as conn, conn.cursor() as cur:
-            row = db.save_new_ticker(cur, date_for_DB)
-        return row
- 
+        # with db.get_db_connection() as conn, conn.cursor() as cur:
+        #     row = db.save_new_ticker(cur, date_for_DB)
+        # return row
+
+     
 # удаление тикера из БД
 # @app.delete("/ticker/delete_ticker/{ticker}")
 # def delete_ticker(ticker:str):
