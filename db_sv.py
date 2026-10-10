@@ -72,7 +72,7 @@ def fair_value_tickers(cur)->list[dict[str,Any]]:
     
     return  result
 
-# не интересные тикеры для покупки
+# НЕ интересные тикеры для покупки
 def overvalued_tickers(cur)->list[dict[str,Any]]:
     result = []
     cur.execute('''SELECT * FROM tsx_stocks WHERE status=%s''',(ticker_status.overvalued.value,))
