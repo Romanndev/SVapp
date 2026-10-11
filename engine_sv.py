@@ -6,6 +6,7 @@ import time
 
 import requests
 import yfinance as yf
+from curl_cffi import requests as curl_requests
 
 import schemas
 
@@ -284,4 +285,41 @@ def test_api(ticker:str):
     #     raise ValueError(f"Invalid JSON received. Response text: {response.text[:200]}")
         
     # return data
+
+
+
+# парсинг актуальных цен по списку тикеров
+def tsx_prices(tickers_list: list[str]) -> dict:
+   
+    prices = {}
+    
+    tickers_limit = 20
+    for i in range(0, len(tickers_list), tickers_limit):
+        package = tickers_list[i : i + tickers_limit]
+        tickers_str = ",".join(package)
+        
+        url = f"https://query1.finance.yahoo.com/v8/finance/spark?symbols={tickers_str}&range=1d&interval=1m"
+
+        try:
+            # Имитируем реальный браузер Chrome
+            response = curl_requests.get(
+                url,
+                impersonate="chrome",
+                timeout=15,
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                for ticker, item in data.items():
+                    fresh_price = item.get("fulldayPrice")
+                    prices[ticker] = float(fresh_price)
+                    
+            
+
+        except Exception as e:
+            print(f"The data did not get for that list of tickers: {tickers_str}")
+            print(f"Error: {e}")
+       
+    return prices
+
 

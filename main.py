@@ -12,7 +12,7 @@ app = FastAPI(title="Stock Valuation App", description="API for Stock Valuation 
 
 
 #список интересных тикеров для покупки
-@app.get("/tsx_stocks/fair_value", tags=["tsx_stocks"], response_model=list[schemas.ticker])
+@app.get("/tsx_stocks/fair_value", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
 def fair_value():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.fair_value_tickers(cur)
@@ -20,7 +20,7 @@ def fair_value():
         return row
 
 #список не интересных тикеров для покупки
-@app.get("/tsx_stocks/overvalued", tags=["tsx_stocks"], response_model=list[schemas.ticker])
+@app.get("/tsx_stocks/overvalued", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
 def overvalued():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.overvalued_tickers(cur)
@@ -47,7 +47,7 @@ def get_scalar_docs():
 def read_root():
     return {"status": "ok"}
 
-#app.include_router(ur.router, prefix="/update", tags=["update"])
+app.include_router(ur.router, prefix="/update", tags=["update"])
 
 
 # ---------------------------------------------------------------------

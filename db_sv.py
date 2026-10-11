@@ -7,6 +7,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 import psycopg2
+from requests_cache import timedelta
 
 import engine_sv as sv
 import schemas
@@ -59,15 +60,14 @@ def fair_value_tickers(cur)->list[dict[str,Any]]:
     
     for row in rows:
         result.append({
+                    'id': row[0],
                     'ticker': row[1],
                     'fullname': row[2],
                     'price': row[3],
                     'currency': row[4],
                     'truePrice': row[7],
                     'status': row[8],
-                    #'id': row[0],
-                    #'update_date': row[9]
-                    
+                    'update_date': row[9]
                     })
     
     return  result
@@ -80,14 +80,14 @@ def overvalued_tickers(cur)->list[dict[str,Any]]:
     
     for row in rows:
         result.append({
+                    'id': row[0],
                     'ticker': row[1],
                     'fullname': row[2],
                     'price': row[3],
                     'currency': row[4],
                     'truePrice': row[7],
                     'status': row[8],
-                    #'id': row[0],
-                    #'update_date': row[9]
+                    'update_date': row[9]
                     
                     })
     
@@ -118,15 +118,14 @@ def ticker_info(cur,ticker:str)->dict[str,Any] | None:
     
     if row is None: return None
     
-    return {
+    return {    'id': row[0],
                 'ticker': row[1],
                 'fullname': row[2],
                 'price': row[3],
                 'currency': row[4],
                 'truePrice': row[7],
                 'status': row[8],
-                #'id': row[0],
-                #'update_date': row[9]
+                'update_date': row[9]
                 }
 
 # добавление нового тикера в БД
@@ -154,32 +153,71 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
                 'status': row[8],
                 'update_date': row[9]
                 }
- 
-#обновление данных по всем тикерам в БД
-async def update_tsx_stocks(cur):
+
+
+
+#обновление данных по всем тикерам в БД tsx_stocks по актуальной ЦЕНЕ на ДАТУ
+def update_tsx_stocks(cur):
     tickerslist = []
-    company_data = {}
+    company_prices = {}
+
     current_date = datetime.datetime.now(ZoneInfo("America/Edmonton")).date()
-    tickerslist = tickersupdate(cur,current_date)
-    if not tickerslist: return []
+# # 1. Получаем текущую дату (сегодня)
+#     #today = datetime.now()
 
-    company_data = await sv.companies_data(tickerslist)
-    for ticker, param in company_data.items():  
-         if  param[5] == 0 or param[1] > param[5]:
-            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.overvalued.value,current_date,ticker))
+# # 2. Вычитаем 1 день с помощью timedelta
+#     yesterday = current_date - timedelta(days=1)
 
-         elif param[1] < (param[5]+3):
-            cur.execute('''UPDATE tsx_stocks SET price=%s,truePrice=%s,status=%s,update_date=%s WHERE ticker=%s''',(param[1],param[5],ticker_status.fair_value.value,current_date,ticker))
+# # 3. Форматируем в строку (например, в формате ГГГГ-ММ-ДД, который любит база данных)
+#     yesterday_str = yesterday.strftime("%Y-%m-%d")
+
+    
+
+    tickerslist = tickers_for_update(cur,current_date)
+    if tickerslist :
+         company_prices = sv.tsx_prices(tickerslist)
+    # id, ticker,fullname,price,currency,eps,bvps,truePrice,status,update_date
+         for i in tickerslist:
+            cur.execute(
+                        '''UPDATE tsx_stocks SET price=%s,update_date=%s WHERE ticker=%s''',
+                                (company_prices[i],current_date,i)
+                                )
+            cur.execute('''SELECT truePrice FROM tsx_stocks WHERE ticker=%s''',(i,))
+            truePrice = cur.fetchone() # gvalue
+            if truePrice is None: continue
+            if company_prices[i] > truePrice[0]:
+                cur.execute(
+                            '''UPDATE tsx_stocks SET status=%s WHERE ticker=%s''',(ticker_status.overvalued.value,i)
+                        )
+            if company_prices[i] <= truePrice[0]:    
+                cur.execute(
+                            '''UPDATE tsx_stocks SET status=%s WHERE ticker=%s''',(ticker_status.fair_value.value,i)
+                        )
+            
+    
+    
+    
+
         
-    return []
 
-def tickersupdate(cur,current_date)->list[str]:
+
+
+
+    
+        
+    
+# список тикеров для обновления данных на текущую дату
+def tickers_for_update(cur,current_date)->list[str]:
     tickerslist = []
     cur.execute('''SELECT ticker FROM tsx_stocks WHERE update_date < %s''',(current_date,))
-    tickerslist = cur.fetchone() #cur.fetchall()
+    rows = cur.fetchall()
+    tickerslist = [i[0] for i in rows]
     if tickerslist is None or len(tickerslist) == 0: 
         return [] # empty list if no tickers to update
-    return tickerslist #[row[0] for row in tickerslist[:10]]
+    
+    return tickerslist
+
+
 
 def record_data(cur, all_companies:dict):
     
@@ -220,3 +258,5 @@ def updateSTATUS(cur):
     #cur.execute('''SELECT status FROM tsx_stocks WHERE status=%s''', ('interesting',))
     cur.execute('''UPDATE tsx_stocks SET status=%s WHERE status=%s''',('fair value',ticker_status.interesting.value))
     cur.execute('''UPDATE tsx_stocks SET status=%s WHERE status=%s''',('overvalued',ticker_status.not_interesting.value))
+
+
