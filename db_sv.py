@@ -7,7 +7,6 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 import psycopg2
-from requests_cache import timedelta
 
 import engine_sv as sv
 import schemas
@@ -162,17 +161,6 @@ def update_tsx_stocks(cur):
     company_prices = {}
 
     current_date = datetime.datetime.now(ZoneInfo("America/Edmonton")).date()
-# # 1. Получаем текущую дату (сегодня)
-#     #today = datetime.now()
-
-# # 2. Вычитаем 1 день с помощью timedelta
-#     yesterday = current_date - timedelta(days=1)
-
-# # 3. Форматируем в строку (например, в формате ГГГГ-ММ-ДД, который любит база данных)
-#     yesterday_str = yesterday.strftime("%Y-%m-%d")
-
-    
-
     tickerslist = tickers_for_update(cur,current_date)
     if tickerslist :
          company_prices = sv.tsx_prices(tickerslist)
@@ -193,19 +181,7 @@ def update_tsx_stocks(cur):
                 cur.execute(
                             '''UPDATE tsx_stocks SET status=%s WHERE ticker=%s''',(ticker_status.fair_value.value,i)
                         )
-            
-    
-    
-    
-
-        
-
-
-
-
-    
-        
-    
+          
 # список тикеров для обновления данных на текущую дату
 def tickers_for_update(cur,current_date)->list[str]:
     tickerslist = []
