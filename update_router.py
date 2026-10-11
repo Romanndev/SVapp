@@ -1,4 +1,7 @@
 
+import datetime
+from zoneinfo import ZoneInfo
+
 from fastapi import APIRouter
 
 import db_sv as db
@@ -8,9 +11,10 @@ import schemas
 router = APIRouter()
 
 @router.post("/")
-async def update_tsx_stocks():
+def update_tsx_stocks():
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        await db.update_tsx_stocks(cur)
+        db.update_tsx_stocks(cur)
+                     
         return {'status': 'Tickers are updated'}
 
 # добавление нового тикера
