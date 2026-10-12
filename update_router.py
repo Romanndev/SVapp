@@ -27,7 +27,7 @@ def update_tsx_stocks():
 
      
 # удаление тикера из БД
-@router.delete("/ticker/delete_ticker/{ticker}")
+@router.delete("/delete_ticker/{ticker}")
 def delete_ticker(ticker:str):
     with db.get_db_connection() as conn,conn.cursor() as cur:
         if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
