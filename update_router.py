@@ -1,12 +1,7 @@
 
-import datetime
-from zoneinfo import ZoneInfo
-
 from fastapi import APIRouter
 
 import db_sv as db
-import engine_sv as sv
-import schemas
 
 router = APIRouter()
 
@@ -32,11 +27,11 @@ def update_tsx_stocks():
 
      
 # удаление тикера из БД
-# @app.delete("/ticker/delete_ticker/{ticker}")
-# def delete_ticker(ticker:str):
-#     with db.get_db_connection() as conn,conn.cursor() as cur:
-#         if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
-#         if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
+@router.delete("/ticker/delete_ticker/{ticker}")
+def delete_ticker(ticker:str):
+    with db.get_db_connection() as conn,conn.cursor() as cur:
+        if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
+        if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
 
 # обновление данных по всем тикерам в БД 
 # @app.patch("/ticker/update_tickers", response_model=dict[str,str]) 

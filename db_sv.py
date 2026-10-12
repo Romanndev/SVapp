@@ -16,7 +16,6 @@ from schemas import ticker_status
 @contextmanager
 def get_db_connection():
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
-        #conn = sqlite3.connect('tickers.db')
         cur = conn.cursor()
         create_table(cur)
         try:
@@ -92,7 +91,7 @@ def overvalued_tickers(cur)->list[dict[str,Any]]:
     
     return  result
 
-def check_ticker_name(ticker):
+def check_ticker_name(ticker)-> str:
      ticker = ticker.upper()
 
      if ticker.startswith('-') : ticker = ticker.removeprefix('-')
@@ -153,9 +152,7 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
                 'update_date': row[9]
                 }
 
-
-
-#обновление данных по всем тикерам в БД tsx_stocks по актуальной ЦЕНЕ на ДАТУ
+#обновление данных по всем тикерам в БД (tsx_stocks) по актуальной ЦЕНЕ на ДАТУ
 def update_tsx_stocks(cur):
     tickerslist = []
     company_prices = {}
@@ -193,46 +190,10 @@ def tickers_for_update(cur,current_date)->list[str]:
     
     return tickerslist
 
-
-
-def record_data(cur, all_companies:dict):
-    
-    for name,param in all_companies.items() :
-     
-            if param[5] == 0 or param[1] > param[5] : # [longName,currentPrice,currency, eps, bvps, gvalue]
-                status = ticker_status.not_interesting.value
-            else:
-                status = ticker_status.interesting.value
-        
-            cur.execute('INSERT INTO tsx_stocks(ticker,fullname,price,currency,eps,bvps,truePrice,status) ' \
-            'VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING',
-            (name,param[0],param[1],param[2],param[3],param[4],param[5],status))
-        # [longName,currentPrice,currency, eps, bvps, gvalue]
-
 # удаление записи
 def delete_record(cur,ticker:str):
     ticker = check_ticker_name(ticker)
-    cur.execute('''DELETE FROM tsx_stocks WHERE ticker=%s''',(ticker,))
-    return True        
+    if cur.execute('''DELETE FROM tsx_stocks WHERE ticker=%s''',(ticker,)): return True        
 
-# редактирование записи, иземенение статуса по тикеру
-def edit_record(cur, ticker, status)->dict[str, Any]:
-    cur.execute('''UPDATE tsx_stocks SET status=%s WHERE ticker=%s''',(status,ticker))
-    cur.execute('''SELECT * FROM tsx_stocks WHERE ticker=%s''', (ticker,))
-    row = cur.fetchone()
-    return {
-                'id': row[0],
-                'ticker': row[1],
-                'fullname': row[2],
-                'price': row[3],
-                'currency': row[4],
-                'truePrice': row[5], 
-                'status': row[6]
-                }
-
-def updateSTATUS(cur):
-    #cur.execute('''SELECT status FROM tsx_stocks WHERE status=%s''', ('interesting',))
-    cur.execute('''UPDATE tsx_stocks SET status=%s WHERE status=%s''',('fair value',ticker_status.interesting.value))
-    cur.execute('''UPDATE tsx_stocks SET status=%s WHERE status=%s''',('overvalued',ticker_status.not_interesting.value))
 
 
