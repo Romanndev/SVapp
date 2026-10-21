@@ -50,7 +50,7 @@ def get_scalar_docs():
 def read_root():
     return {"status": "ok"}
 
-app.include_router(ur.router, prefix="/update", tags=["update"])
+# app.include_router(ur.router, prefix="/update", tags=["update"])
 
 
 # ---------------------------------------------------------------------

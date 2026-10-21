@@ -27,11 +27,11 @@ router = APIRouter()
 
      
 # удаление тикера из БД
-@router.delete("/delete_ticker/{ticker}")
-def delete_ticker(ticker:str):
-    with db.get_db_connection() as conn,conn.cursor() as cur:
-        if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
-        if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
+# @router.delete("/delete_ticker/{ticker}")
+# def delete_ticker(ticker:str):
+#     with db.get_db_connection() as conn,conn.cursor() as cur:
+#         if not db.ticker_info(cur, ticker): return {'status':'ticker not found'}
+#         if db.delete_record(cur,ticker) == True: return  {'status': 'ticker is deleted'}
 
 # обновление данных по всем тикерам в БД 
 # @app.patch("/ticker/update_tickers", response_model=dict[str,str]) 
