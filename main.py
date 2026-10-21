@@ -11,18 +11,20 @@ import update_router as ur
 app = FastAPI(title="Stock Valuation App", description="API for Stock Valuation App", version="1.0.0")
 
 
-#список интересных тикеров для покупки
+#список справедливых тикеров
 @app.get("/tsx_stocks/fair_value", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
 def fair_value():
     with db.get_db_connection() as conn, conn.cursor() as cur:
+        db.update_tsx_stocks(cur)
         row = db.fair_value_tickers(cur)
 
         return row
 
-#список не интересных тикеров для покупки
+#список переоцененных тикеров
 @app.get("/tsx_stocks/overvalued", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
 def overvalued():
     with db.get_db_connection() as conn, conn.cursor() as cur:
+        db.update_tsx_stocks(cur)
         row = db.overvalued_tickers(cur)
 
         return row

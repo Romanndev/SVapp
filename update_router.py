@@ -5,12 +5,12 @@ import db_sv as db
 
 router = APIRouter()
 
-@router.post("/")
-def update_tsx_stocks():
-    with db.get_db_connection() as conn, conn.cursor() as cur:
-        db.update_tsx_stocks(cur)
+# @router.post("/")
+# def update_tsx_stocks():
+#     with db.get_db_connection() as conn, conn.cursor() as cur:
+#         db.update_tsx_stocks(cur)
                      
-        return {'status': 'Tickers are updated'}
+#         return {'status': 'Tickers are updated'}
 
 # добавление нового тикера
 # @router.post("/{ticker}")
