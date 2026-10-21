@@ -33,6 +33,7 @@ def overvalued():
 @app.get("/tsx_stocks/ticker_info/{ticker}", tags=["tsx_stocks"],response_model=schemas.ticker | dict[str,Any])   
 def ticker_info(ticker:str):
     with db.get_db_connection() as conn, conn.cursor() as cur:
+        db.update_tsx_stocks(cur)
         row = db.ticker_info(cur, ticker)
         if row == None: return {'status':'no ticker in the database'}
         return row
