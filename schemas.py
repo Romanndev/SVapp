@@ -18,7 +18,7 @@ class ticker(BaseModel):
     status : ticker_status
 
 class ticker_info(ticker):
-    id : int
+    #id : int
     # ticker : str
     # fullname : str
     # price : float

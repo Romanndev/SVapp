@@ -58,7 +58,7 @@ def fair_value_tickers(cur)->list[dict[str,Any]]:
     
     for row in rows:
         result.append({
-                    'id': row[0],
+                    #'id': row[0],
                     'ticker': row[1],
                     'fullname': row[2],
                     'price': row[3],
@@ -78,7 +78,7 @@ def overvalued_tickers(cur)->list[dict[str,Any]]:
     
     for row in rows:
         result.append({
-                    'id': row[0],
+                    #'id': row[0],
                     'ticker': row[1],
                     'fullname': row[2],
                     'price': row[3],
@@ -116,7 +116,7 @@ def ticker_info(cur,ticker:str)->dict[str,Any] | None:
     
     if row is None: return None
     
-    return {    'id': row[0],
+    return {    #'id': row[0],
                 'ticker': row[1],
                 'fullname': row[2],
                 'price': row[3],

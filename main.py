@@ -30,7 +30,7 @@ def overvalued():
         return row
 
 # инфо по тикеру
-@app.get("/tsx_stocks/ticker_info/{ticker}", tags=["tsx_stocks"],response_model=schemas.ticker | dict[str,Any])   
+@app.get("/tsx_stocks/ticker_info/{ticker}", tags=["tsx_stocks"],response_model=schemas.ticker_info | dict[str,Any])   
 def ticker_info(ticker:str):
     with db.get_db_connection() as conn, conn.cursor() as cur:
         db.update_tsx_stocks(cur)
