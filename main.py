@@ -11,14 +11,25 @@ import update_router as ur
 app = FastAPI(title="Stock Valuation App", description="API for Stock Valuation App", version="1.0.0")
 
 
-#список справедливых тикеров
-@app.get("/tsx_stocks/fair_value", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
-def fair_value():
+# список справедливых тикеров Financials
+# интересные тикеры для покупки (по сектору) (, Energy, Basic Materials, Industrials, Consumer Discretionary, Consumer Staples, Health Care, Information Technology, Communication Services, Utilities, Real Estate)
+@app.get("/tsx_stocks/fair_value_Financials", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
+def fair_value_Financials():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         db.update_tsx_stocks(cur)
-        row = db.fair_value_tickers(cur)
+        row = db.fair_value_tickers(cur, 'Financials')
 
         return row
+
+# список справедливых тикеров Basic Materials
+# интересные тикеры для покупки (по сектору) (, Energy, Basic Materials, Industrials, Consumer Discretionary, Consumer Staples, Health Care, Information Technology, Communication Services, Utilities, Real Estate)
+@app.get("/tsx_stocks/fair_value_Basic_Materials", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
+def fair_value_Basic_Materials():
+    with db.get_db_connection() as conn, conn.cursor() as cur:
+        db.update_tsx_stocks(cur)
+        row = db.fair_value_tickers(cur, 'Basic Materials')
+
+        return row    
 
 #список переоцененных тикеров
 @app.get("/tsx_stocks/overvalued", tags=["tsx_stocks"], response_model=list[schemas.ticker_info])
@@ -50,7 +61,8 @@ def get_scalar_docs():
 def read_root():
     return {"status": "ok"}
 
-# app.include_router(ur.router, prefix="/update", tags=["update"])
+app.include_router(ur.router, prefix="/update", tags=["update"])
+
 
 
 # ---------------------------------------------------------------------

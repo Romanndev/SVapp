@@ -1,10 +1,38 @@
 
+from typing import Any
+
 from fastapi import APIRouter
 
 import db_sv as db
 
 router = APIRouter()
 
+
+# добавление новой колонки в таблицу
+@router.post("/new_column",tags=["update"])
+def new_column(column_name:str,column_type: Any):
+    with db.get_db_connection() as conn, conn.cursor() as cur:
+        db.add_column(cur, column_name, column_type)
+        return {"status": "ok"}
+
+#обновление статуса по тикерам, на усмотрение пользователя
+#--------------------------------------------------------------------------------
+@router.patch("/ticker/update_sector/{ticker},{sector}", tags=["update"])
+def update_status(ticker:str,sector:str):
+    with db.get_db_connection() as conn, conn.cursor() as cur:
+        row = db.edit_record(cur,ticker,sector)
+        cur.close()
+        return row 
+
+
+
+
+
+
+
+
+
+# -----------------------------------------------------------------------------------------------------
 # @router.post("/")
 # def update_tsx_stocks():
 #     with db.get_db_connection() as conn, conn.cursor() as cur:

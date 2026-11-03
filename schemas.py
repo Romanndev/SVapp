@@ -14,7 +14,7 @@ class ticker(BaseModel):
     fullname : str
     price : float
     currency : str
-    truePrice : float
+    true_price : float
     status : ticker_status
 
 class ticker_info(ticker):
@@ -23,9 +23,10 @@ class ticker_info(ticker):
     # fullname : str
     # price : float
     # currency : str
-    # truePrice : float
+    # true_price : float
     # status : ticker_status
     update_date : date
+    sector : str
       
 
 class newticker(ticker):
