@@ -32,3 +32,16 @@ class ticker_info(ticker):
 class newticker(ticker):
     eps : float
     bvps : float
+
+class ticker_sector(Enum):
+    telecommunications = 'Telecommunications'
+    financials = 'Financials'
+    technology = 'Technology'
+    energy = 'Energy'
+    industrials = 'Industrials'
+    basic_materials = 'Basic Materials'
+    consumer_discretionary = 'Consumer Discretionary'
+    consumer_staples = 'Consumer Staples'
+    health_care = 'Health Care'
+    utilities = 'Utilities'
+    real_estate = 'Real Estate'

@@ -36,7 +36,7 @@ def create_table(cur):
                 currency STRING,
                 eps FLOAT4,
                 bvps FLOAT4,
-                true_price FLOAT4,
+                truePrice FLOAT4,
                 status STRING,
                 update_date DATE DEFAULT current_timestamp():::DATE,
                 CONSTRAINT tsx_stocks_pkey PRIMARY KEY (id ASC),
@@ -138,7 +138,7 @@ def save_new_ticker(cur, newticker_date: schemas.newticker)->dict[str, Any]:
     currency = newticker_date.currency
     eps = newticker_date.eps
     bvps = newticker_date.bvps
-    true_price = newticker_date.true_price
+    true_price = newticker_date.truePrice
     status = newticker_date.status.value
 
     cur.execute('''INSERT INTO tsx_stocks(ticker, fullname, price, currency,eps,bvps,true_price, status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (ticker) DO NOTHING''', (ticker, fullname, price, currency,eps,bvps,true_price, status))
@@ -171,7 +171,7 @@ def update_tsx_stocks(cur):
                         '''UPDATE tsx_stocks SET price=%s,update_date=%s WHERE ticker=%s''',
                                 (company_prices[i],current_date,i)
                                 )
-            cur.execute('''SELECT true_price FROM tsx_stocks WHERE ticker=%s''',(i,))
+            cur.execute('''SELECT truePrice FROM tsx_stocks WHERE ticker=%s''',(i,))
             true_price = cur.fetchone() # gvalue
             if true_price is None: continue
             if company_prices[i] > true_price[0]:
