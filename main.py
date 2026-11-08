@@ -2,6 +2,7 @@ from typing import Any
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from scalar_fastapi import get_scalar_api_reference
 
 import db_sv as db
@@ -12,6 +13,14 @@ import update_router as ur
 
 app = FastAPI(title="Stock Valuation App", description="API for Stock Valuation App", version="1.0.0")
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://svapp-web.onrender.com/"],  # Или укажите точный URL вашего фронтенда на Render
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(fr.router, tags=["tsx_stocks fair value"])
 app.include_router(ovrr.router, tags=["tsx_stocks overvalued"])
