@@ -8,21 +8,31 @@ import db_sv as db
 router = APIRouter()
 
 
-# добавление новой колонки в таблицу
-@router.post("/new_column",tags=["update"])
-def new_column(column_name:str,column_type: Any):
+@router.get("/tsx_stocks/update_tickers", response_model=dict[str,str], tags=["update"])
+def update_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        db.add_column(cur, column_name, column_type)
-        return {"status": "ok"}
+       try: 
+        db.update_tsx_stocks(cur)
+       except Exception as e:
+            return {'status': 'Error occurred while updating tickers'}
+    return {'status': 'Tickers are updated'}
 
-#обновление статуса по тикерам, на усмотрение пользователя
-#--------------------------------------------------------------------------------
-@router.patch("/ticker/update_sector/{ticker},{sector}", tags=["update"])
-def update_status(ticker:str,sector:str):
-    with db.get_db_connection() as conn, conn.cursor() as cur:
-        row = db.edit_record(cur,ticker,sector)
-        cur.close()
-        return row 
+
+# добавление новой колонки в таблицу
+# @router.post("/new_column",tags=["update"])
+# def new_column(column_name:str,column_type: Any):
+#     with db.get_db_connection() as conn, conn.cursor() as cur:
+#         db.add_column(cur, column_name, column_type)
+#         return {"status": "ok"}
+
+# #обновление статуса по тикерам, на усмотрение пользователя
+# #--------------------------------------------------------------------------------
+# @router.patch("/ticker/update_sector/{ticker},{sector}", tags=["update"])
+# def update_status(ticker:str,sector:str):
+#     with db.get_db_connection() as conn, conn.cursor() as cur:
+#         row = db.edit_record(cur,ticker,sector)
+#         cur.close()
+#         return row 
 
 
 
