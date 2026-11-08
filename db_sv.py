@@ -162,6 +162,10 @@ def update_tsx_stocks(cur):
     company_prices = {}
 
     current_date = datetime.datetime.now(ZoneInfo("America/Edmonton")).date()
+    cur.execute('''SELECT update_date FROM tsx_stocks''')
+    last_update = cur.fetchone() 
+    if last_update is not None and last_update[0] == current_date: return 
+
     tickerslist = tickers_for_update(cur,current_date)
     if tickerslist :
          company_prices = sv.tsx_prices(tickerslist)
