@@ -11,7 +11,11 @@ router = APIRouter()
 @router.get("/tsx_stocks/fair_value/Financials", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Financials():
     with db.get_db_connection() as conn, conn.cursor() as cur:
-        db.update_tsx_stocks(cur)
+        try:
+         db.update_tsx_stocks(cur)
+        except Exception as e:
+          print(f"⚠️ Не удалось обновить котировки из внешнего API: {e}")
+        
         row = db.fair_value_tickers(cur, 'Financials')
 
         return row
