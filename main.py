@@ -16,7 +16,7 @@ app = FastAPI(title="Stock Valuation App", description="API for Stock Valuation 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://svapp-web.onrender.com/"],  # Или укажите точный URL вашего фронтенда на Render
+    allow_origins=["https://svapp-web.onrender.com"],  # Или укажите точный URL вашего фронтенда на Render
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
