@@ -215,76 +215,76 @@ def test_update(cur):
       time.sleep(10)
       print(ticker,'=', priceP)
 
-def test_api(ticker:str):
-    # url = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=Royal+Bank+of+Canada&apikey=os.environ["av_api_key"]'
-    # #url = 'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey=os.environ["av_api_key"]'
-    # r = requests.get(url)
-    # data = r.json()
+# def test_api(ticker:str):
+#     # url = 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=Royal+Bank+of+Canada&apikey=os.environ["av_api_key"]'
+#     # #url = 'https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey=os.environ["av_api_key"]'
+#     # r = requests.get(url)
+#     # data = r.json()
 
-    # print(data)
+#     # print(data)
 
-    # return 'Finished'
-# RY.TRT
-    # price работает
-    # url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey=os.environ["alphavantage_api_key"]'
-    # response = requests.get(url)
-    # if response.status_code == 200:
-    #     data = response.json()
-    #     if 'Global Quote' in data and '05. price' in data['Global Quote']:
-    #          return float(data['Global Quote']['05. price'])
-    #     print(data)
+#     # return 'Finished'
+# # RY.TRT
+#     # price работает
+#     # url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey=os.environ["alphavantage_api_key"]'
+#     # response = requests.get(url)
+#     # if response.status_code == 200:
+#     #     data = response.json()
+#     #     if 'Global Quote' in data and '05. price' in data['Global Quote']:
+#     #          return float(data['Global Quote']['05. price'])
+#     #     print(data)
     
-    #  url = f'https://eodhd.com/api/fundamentals/{ticker}?api_token=os.environ["eodhd_api_key"]&fmt=json'
-    #  response = requests.get(url)
-    #  data = response.json()
+#     #  url = f'https://eodhd.com/api/fundamentals/{ticker}?api_token=os.environ["eodhd_api_key"]&fmt=json'
+#     #  response = requests.get(url)
+#     #  data = response.json()
 
-    #  print(data)
+#     #  print(data)
 
      
 
-    url = 'https://eodhd.com/api/v1.1/fundamentals/RY.TO?api_token=os.environ["eodhd_api_key"]&fmt=json'
-    data = requests.get(url).json()
+#     url = 'https://eodhd.com/api/v1.1/fundamentals/RY.TO?api_token=os.environ["eodhd_api_key"]&fmt=json'
+#     data = requests.get(url).json()
 
-    print(data)
+#     print(data)
     
-    # eps = data.get('EPS')
-    # url = f'https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={ticker}&apikey=os.environ["av_api_key"]'
-    # response = requests.get(url)
-    #     #if response.status_code == 200:
-    # data = response.json()
+#     # eps = data.get('EPS')
+#     # url = f'https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol={ticker}&apikey=os.environ["av_api_key"]'
+#     # response = requests.get(url)
+#     #     #if response.status_code == 200:
+#     # data = response.json()
 
-    # print(data)
+#     # print(data)
 
-    #BVPS = totalShareholderEquity / commonStockSharesOutstanding    
-    #https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=RY.TRT&apikey=YOUR_API_KEY
+#     #BVPS = totalShareholderEquity / commonStockSharesOutstanding    
+#     #https://www.alphavantage.co/query?function=BALANCE_SHEET&symbol=RY.TRT&apikey=YOUR_API_KEY
     
     
 
 
-    # # Берем токен из переменных окружения
-    # api_token = os.environ.get("api_key") # или "EODHD_API_KEY" в зависимости от того, как вы назвали переменную
+#     # # Берем токен из переменных окружения
+#     # api_token = os.environ.get("api_key") # или "EODHD_API_KEY" в зависимости от того, как вы назвали переменную
     
-    # url = f"https://eodhd.com/api/fundamentals/{ticker}"
+#     # url = f"https://eodhd.com/api/fundamentals/{ticker}"
     
-    # # Передаем параметры через словарь — requests сам подставит их в URL
-    # params = {
-    #     "api_token": api_token,
-    #     "fmt": "json"
-    # }
+#     # # Передаем параметры через словарь — requests сам подставит их в URL
+#     # params = {
+#     #     "api_token": api_token,
+#     #     "fmt": "json"
+#     # }
     
-    # response = requests.get(url, params=params, timeout=15)
+#     # response = requests.get(url, params=params, timeout=15)
     
-    # # 1. Проверяем HTTP-статус
-    # if response.status_code != 200:
-    #     raise ValueError(f"EODHD API returned status {response.status_code}: {response.text}")
+#     # # 1. Проверяем HTTP-статус
+#     # if response.status_code != 200:
+#     #     raise ValueError(f"EODHD API returned status {response.status_code}: {response.text}")
     
-    # # 2. Безопасно парсим JSON
-    # try:
-    #     data = response.json()
-    # except requests.exceptions.JSONDecodeError:
-    #     raise ValueError(f"Invalid JSON received. Response text: {response.text[:200]}")
+#     # # 2. Безопасно парсим JSON
+#     # try:
+#     #     data = response.json()
+#     # except requests.exceptions.JSONDecodeError:
+#     #     raise ValueError(f"Invalid JSON received. Response text: {response.text[:200]}")
         
-    # return data
+#     # return data
 
 
 
