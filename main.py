@@ -49,6 +49,10 @@ def get_scalar_docs():
 # def read_root():
 #     return {"status": "ok"}
 
+@app.get("/health", tags=["root"])
+def health_check():
+    return {"status": "healthy"}
+
 #app.include_router(ur.router, prefix="/update", tags=["update"])
 
 
