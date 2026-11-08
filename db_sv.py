@@ -199,7 +199,6 @@ def delete_record(cur,ticker:str):
     ticker = check_ticker_name(ticker)
     if cur.execute('''DELETE FROM tsx_stocks WHERE ticker=%s''',(ticker,)): return True        
 
-
 # добавление новой колонки в таблицу
 def add_column(cur,column_name:str,column_type: Any):
     try:

@@ -305,7 +305,7 @@ def tsx_prices(tickers_list: list[str]) -> dict:
             response = curl_requests.get(
                 url,
                 impersonate="chrome",
-                timeout=15,
+                timeout=60,
             )
 
             if response.status_code == 200:
