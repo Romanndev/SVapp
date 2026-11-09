@@ -25,7 +25,7 @@ app = FastAPI(title="Stock Valuation App", description="API for Stock Valuation 
 
 app.include_router(fr.router, tags=["tsx_stocks fair value"])
 app.include_router(ovrr.router, tags=["tsx_stocks overvalued"])
-app.include_router(ur.router, prefix="/update", tags=["update"])
+app.include_router(ur.router, tags=["update"])
 
 
 
