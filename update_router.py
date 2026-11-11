@@ -8,7 +8,7 @@ import db_sv as db
 router = APIRouter()
 
 
-@router.get("/tsx_stocks/update_tickers", response_model=dict[str,str])
+@router.post("/tsx_stocks/update_tickers", response_model=dict[str,str])
 def update_tickers():
     with db.get_db_connection() as conn, conn.cursor() as cur:
        try: 
