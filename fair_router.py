@@ -16,7 +16,7 @@ def fair_value_Financials():
         return row
 
 # список справедливых тикеров Basic Materials
-@router.get("/tsx_stocks/fair_value/Basic Materials", response_model=list[schemas.ticker_info] | dict[str,Any])
+@router.get("/tsx_stocks/fair_value/Basic_Materials", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Basic_Materials():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         #db.update_tsx_stocks(cur)
@@ -41,7 +41,7 @@ def fair_value_Industrials():
         return row 
 
 # список справедливых тикеров Consumer Discretionary
-@router.get("/tsx_stocks/fair_value/Consumer Discretionary", response_model=list[schemas.ticker_info] | dict[str,Any])
+@router.get("/tsx_stocks/fair_value/Consumer_Discretionary", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Consumer_Discretionary():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.fair_value_tickers(cur, 'Consumer Discretionary')
@@ -49,7 +49,7 @@ def fair_value_Consumer_Discretionary():
         return row 
 
 # список справедливых тикеров Consumer Staples
-@router.get("/tsx_stocks/fair_value/Consumer Staples", response_model=list[schemas.ticker_info] | dict[str,Any])
+@router.get("/tsx_stocks/fair_value/Consumer_Staples", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Consumer_Staples():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.fair_value_tickers(cur, 'Consumer Staples')
@@ -57,7 +57,7 @@ def fair_value_Consumer_Staples():
         return row 
 
 # список справедливых тикеров Health Care
-@router.get("/tsx_stocks/fair_value/Health Care", response_model=list[schemas.ticker_info] | dict[str,Any])
+@router.get("/tsx_stocks/fair_value/Health_Care", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Health_Care():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.fair_value_tickers(cur, 'Health Care')
@@ -89,7 +89,7 @@ def fair_value_Utilities():
         return row
 
 # список справедливых тикеров Real Estate
-@router.get("/tsx_stocks/fair_value/Real Estate", response_model=list[schemas.ticker_info] | dict[str,Any])
+@router.get("/tsx_stocks/fair_value/Real_Estate", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Real_Estate():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         row = db.fair_value_tickers(cur, 'Real Estate')
