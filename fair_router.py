@@ -16,7 +16,7 @@ def fair_value_Financials():
         return row
 
 # список справедливых тикеров Basic Materials
-@router.get("/tsx_stocks/fair_value/Basic_Materials", response_model=list[schemas.ticker_info] | dict[str,Any])
+@router.get("/tsx_stocks/fair_value/Basic Materials", response_model=list[schemas.ticker_info] | dict[str,Any])
 def fair_value_Basic_Materials():
     with db.get_db_connection() as conn, conn.cursor() as cur:
         #db.update_tsx_stocks(cur)
